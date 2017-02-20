@@ -1,0 +1,9 @@
+[package]
+name = "boxcrash"
+version = "0.1.0"
+authors = ["Do Duy <doduycm@gmail.com>"]
+
+[dependencies]
+piston_window = "0.63.0"
+piston2d-opengl_graphics = "0.39.0"
+rand = "0.3.14"
