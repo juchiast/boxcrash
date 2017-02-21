@@ -1,4 +1,1 @@
-mod models;
-
-fn main() {
-}
+fn main() {}

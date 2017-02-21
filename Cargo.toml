@@ -7,3 +7,4 @@ authors = ["Do Duy <doduycm@gmail.com>"]
 piston_window = "0.63.0"
 piston2d-opengl_graphics = "0.39.0"
 rand = "0.3.14"
+cgmath = "0.12.0"
