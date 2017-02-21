@@ -26,7 +26,7 @@ impl Camera {
             zoom_factor: w / MAX_CAM_WIDTH,
         }
     }
-    pub fn render(&self, x: Vector3<f64>) -> Option<Pixel> {
+    pub fn render(&self, x: &Vector3<f64>) -> Option<Pixel> {
         let x = (self.c.magnitude()/self.c.dot(x-self.eye))*x- self.c;
         let a = x.dot(self.axis_x)/self.axis_x.magnitude();
         let b = f64::sqrt(x.magnitude2()-a*a);
