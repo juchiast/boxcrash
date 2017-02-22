@@ -1,16 +1,14 @@
 use Pixel;
-use cgmath::Vector2;
+use cgmath::Vector3;
 
 pub struct Tunel {
-    pub length: f64,
-    pub size: Vector2<f64>,
+    pub size: Vector3<f64>,
 }
 
 impl Tunel {
-    pub fn new() -> Tunel {
+    pub fn new(size: [f64; 3]) -> Tunel {
         Tunel {
-            length: 150.0,
-            size: Vector2::new(30.0, 20.0),
+            size: Vector3::from(size),
         }
     }
 }
