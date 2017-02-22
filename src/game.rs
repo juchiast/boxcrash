@@ -4,12 +4,15 @@ use piston_window::*;
 use car::CarRules;
 use tunel::Tunel;
 use color::*;
+use camera::Camera;
+use cgmath::{Vector3, Vector2};
 
 pub struct Game {
     config: GameConfig,
     world: World,
     window: PistonWindow,
     bot_rules: CarRules,
+    camera: Camera,
 }
 
 pub struct GameConfig {
@@ -41,11 +44,15 @@ impl Game {
             color: Vec::new(),
         };
         let world = World::new(&config);
+        let camera = Camera::new(config.screen_size.clone(),
+                                 Vector3::new(world.player.position.x,
+                                              world.player.size.y*2., 0.));
         Game {
             config: config,
             world: world,
             window: window,
             bot_rules: bot_rules,
+            camera: camera,
         }
     }
 
@@ -64,11 +71,19 @@ impl Game {
     fn key_press(&mut self, key: Key) {}
     fn key_release(&mut self, key: Key) {}
     fn draw(&mut self, e: &Input) {
+        let mut lines = Vec::new();
+        lines.append(&mut self.world.tunel.render(&self.camera));
+        lines.append(&mut self.world.player.render(&self.camera));
         self.window.draw_2d(e, |c, g| {
             clear(BLACK, g);
-            polygon(RED, &[[400., 400.], [500., 500.], [450., 300.]], c.transform, g);
-            line(BLUE, 1., [-100., 0., 900., 500.], c.transform, g);
+            for (l, color) in lines {
+                line(color, 1., convert(l), c.transform, g);
+            }
         });
     }
     fn update(&mut self, dt: f64) {}
+}
+
+fn convert(x: [Vector2<f64>; 2]) -> [f64; 4] {
+    [x[0].x, x[0].y, x[1].x, x[1].y]
 }

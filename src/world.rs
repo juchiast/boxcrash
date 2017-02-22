@@ -14,7 +14,7 @@ impl World {
     pub fn new(config: &GameConfig) -> World {
         let player = Car {
             size: Vector3::from(config.player_size),
-            position: Vector3::new(config.tunel_size[0]/2., 0., 3.),
+            position: Vector3::new(config.tunel_size[0]/2., 0., 6.),
             speed: config.player_speed,
             turn_speed: config.player_turn_speed,
             color: color::YELLOW,       

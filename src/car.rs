@@ -1,8 +1,9 @@
 use Color;
 use color;
 use Pixel;
-use cgmath::Vector3;
+use cgmath::{Vector3, Vector2};
 use rand;
+use camera::Camera;
 
 pub struct Car {
     pub size: Vector3<f64>,
@@ -33,6 +34,24 @@ impl Car {
                 rules.color[rand::random::<usize>() % rules.color.len()]
             }
         }
+    }
+
+    pub fn render(&self, camera: &Camera) -> Vec<([Vector2<f64>; 2], Color)> {
+        let mut front = [self.position; 4];
+        front[0].y += self.size.y; front[1].y += self.size.y;
+        front[0].x -= self.size.x/2.; front[3].x -= self.size.x/2.;
+        front[1].x += self.size.x/2.; front[2].x += self.size.x/2.;
+        let mut rear = front.clone();
+        for i in 0..4 {
+            rear[i].z += self.size.z;
+        }
+        let mut ret = Vec::new();
+        for i in 0..4 {
+            ret.push(camera.render_line(&front[i], &front[(i+1)%4]));
+            ret.push(camera.render_line(&rear[i], &rear[(i+1)%4]));
+            ret.push(camera.render_line(&front[i], &rear[i]));
+        }
+        ret.into_iter().filter(|x| x.is_some()).map(|x| (x.unwrap(), self.color)).collect()
     }
 }
 

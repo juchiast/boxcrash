@@ -2,6 +2,7 @@ extern crate rand;
 extern crate cgmath;
 extern crate piston_window;
 
+#[derive(Clone)]
 pub struct Pixel {
     pub w: u32,
     pub h: u32,
