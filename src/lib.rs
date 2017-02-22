@@ -1,7 +1,6 @@
 extern crate rand;
 extern crate cgmath;
 extern crate piston_window;
-extern crate opengl_graphics;
 
 pub struct Pixel {
     pub w: u32,
