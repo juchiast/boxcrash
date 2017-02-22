@@ -14,17 +14,17 @@ impl World {
     pub fn new() -> World {
         let tunel = Tunel::new();
         let player = Car {
+            size: Vector3::new(1.5, 2., 3.),
             position: Vector3::new(tunel.size.x/2., 0., 3.),
-            length: 8.,
             speed: 8.,
             turn_speed: 3.,
             color: color::YELLOW,       
         };
         let rules = CarRules {
-            position: Some(([0., 0., tunel.length], [tunel.size.x, 0., tunel.length])),
-            length: Some((5., 10.)),
-            speed: Some((5., 10.)),
-            turn_speed: Some((1., 5.)),
+            size: [(1., 2.), (1.5, 2.), (3., 4.)],
+            position: [(0., tunel.size.x), (0., 0.), (0., tunel.length)],
+            speed: (5., 10.),
+            turn_speed: (0., 0.),
             color: Vec::new(),
         };
         World {
