@@ -27,7 +27,7 @@ impl Camera {
         }
     }
     pub fn render(&self, x: &Vector3<f64>) -> Option<Pixel> {
-        let x = (self.c.magnitude()/self.c.dot(x-self.eye))*x- self.c;
+        let x = (self.c.magnitude2()/self.c.dot(x-self.eye))*x- self.c;
         let a = x.dot(self.axis_x)/self.axis_x.magnitude();
         let b = f64::sqrt(x.magnitude2()-a*a);
         if f64::abs(a) > self.limit.x || f64::abs(b) > self.limit.y {
