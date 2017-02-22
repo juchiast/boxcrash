@@ -19,6 +19,12 @@ pub struct GameConfig {
     pub ups: u64,
     pub max_fps: u64,
     pub tunel_size: [f64; 3],
+    pub player_size: [f64; 3],
+    pub player_speed: f64,
+    pub player_turn_speed: f64,
+    pub bot_size: [(f64, f64); 3],
+    pub bot_speed: (f64, f64),
+    pub bot_turn_speed: (f64, f64),
 }
 
 impl Game {
@@ -30,10 +36,10 @@ impl Game {
         window.set_ups(config.ups);
         window.set_max_fps(config.max_fps);
         let bot_rules = CarRules {
-            size: [(1., 2.), (1.5, 2.), (3., 4.)],
+            size: config.bot_size,
             position: [(0., config.tunel_size[0]), (0., 0.), (0., config.tunel_size[2])],
-            speed: (5., 10.),
-            turn_speed: (0., 0.),
+            speed: config.bot_speed,
+            turn_speed: config.bot_turn_speed,
             color: Vec::new(),
         };
         let world = World::new(&config);

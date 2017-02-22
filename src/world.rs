@@ -13,10 +13,10 @@ pub struct World {
 impl World {
     pub fn new(config: &GameConfig) -> World {
         let player = Car {
-            size: Vector3::new(1.5, 2., 3.),
+            size: Vector3::from(config.player_size),
             position: Vector3::new(config.tunel_size[0]/2., 0., 3.),
-            speed: 8.,
-            turn_speed: 3.,
+            speed: config.player_speed,
+            turn_speed: config.player_turn_speed,
             color: color::YELLOW,       
         };
 
