@@ -26,6 +26,10 @@ pub struct GameConfig {
     pub bot_size: [(f64, f64); 3],
     pub bot_speed: (f64, f64),
     pub bot_turn_speed: (f64, f64),
+    pub divider_size: [f64; 2],
+    pub camera_height: f64,
+    pub camera_distance: f64,
+    pub decor_distance: f64,
 }
 
 impl Game {
@@ -45,7 +49,8 @@ impl Game {
         let world = World::new(&config);
         let camera = Camera::new(config.screen_size.clone(),
                                  Vector3::new(world.player.position.x,
-                                              world.player.size.y*2., 0.));
+                                              config.camera_height,
+                                              world.player.position.z-config.camera_distance));
         Game {
             config: config,
             world: world,
@@ -78,7 +83,9 @@ impl Game {
             }
         });
     }
-    fn update(&mut self, dt: f64) {}
+    fn update(&mut self, dt: f64) {
+        self.world.update(dt);
+    }
 }
 
 fn convert(x: [Vector2<f64>; 2]) -> [f64; 4] {
