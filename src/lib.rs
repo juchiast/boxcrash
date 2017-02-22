@@ -26,5 +26,4 @@ mod world;
 mod tunel;
 mod car;
 mod camera;
-mod drawer;
 pub mod game;

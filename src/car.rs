@@ -1,6 +1,5 @@
 use Color;
-use color;
-use Pixel;
+use color::*;
 use cgmath::{Vector3, Vector2};
 use rand;
 use camera::Camera;
@@ -29,7 +28,7 @@ impl Car {
             speed: rnd(rules.speed),
             turn_speed: rnd(rules.turn_speed),
             color: if rules.color.is_empty() {
-                color::BLUE
+                BLUE
             } else {
                 rules.color[rand::random::<usize>() % rules.color.len()]
             }

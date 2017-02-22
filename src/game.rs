@@ -2,10 +2,9 @@ use Pixel;
 use world::World;
 use piston_window::*;
 use car::CarRules;
-use tunel::Tunel;
-use color::*;
 use camera::Camera;
 use cgmath::{Vector3, Vector2};
+use color::*;
 
 pub struct Game {
     config: GameConfig,
@@ -61,7 +60,7 @@ impl Game {
             match e {
                 Input::Press(Button::Keyboard(key)) => self.key_press(key),
                 Input::Release(Button::Keyboard(key)) => self.key_release(key),
-                Input::Render(args) => self.draw(&e),
+                Input::Render(_) => self.draw(&e),
                 Input::Update(args) => self.update(args.dt),
                 _ => {}
             }
@@ -71,9 +70,7 @@ impl Game {
     fn key_press(&mut self, key: Key) {}
     fn key_release(&mut self, key: Key) {}
     fn draw(&mut self, e: &Input) {
-        let mut lines = Vec::new();
-        lines.append(&mut self.world.tunel.render(&self.camera));
-        lines.append(&mut self.world.player.render(&self.camera));
+        let lines = self.world.render(&self.camera);
         self.window.draw_2d(e, |c, g| {
             clear(BLACK, g);
             for (l, color) in lines {

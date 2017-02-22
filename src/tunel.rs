@@ -1,4 +1,3 @@
-use Pixel;
 use cgmath::{Vector2, Vector3};
 use Color;
 use color::*;
