@@ -67,7 +67,7 @@ impl Game {
         self.window.draw_2d(e, |c, g| {
             clear(BLACK, g);
             polygon(RED, &[[400., 400.], [500., 500.], [450., 300.]], c.transform, g);
-            line(BLUE, 1., [0., 0., 700., 500.], c.transform, g);
+            line(BLUE, 1., [-100., 0., 900., 500.], c.transform, g);
         });
     }
     fn update(&mut self, dt: f64) {}

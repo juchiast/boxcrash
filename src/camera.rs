@@ -26,16 +26,13 @@ impl Camera {
             zoom_factor: w / MAX_CAM_WIDTH,
         }
     }
-    pub fn render(&self, x: &Vector3<f64>) -> Option<Pixel> {
+    pub fn render(&self, x: &Vector3<f64>) -> Vector2<f64> {
         let x = (self.c.magnitude2()/self.c.dot(x-self.eye))*x- self.c;
         let a = x.dot(self.axis_x)/self.axis_x.magnitude();
         let b = f64::sqrt(x.magnitude2()-a*a);
-        if f64::abs(a) > self.limit.x || f64::abs(b) > self.limit.y {
-            None
-        } else {
-            let w = ((a+self.limit.x)*self.zoom_factor) as u32;
-            let h = self.screen_size.h - ((b+self.limit.y)*self.zoom_factor) as u32;
-            Some(Pixel::new(w, h))
-        }
+
+        let w = (a+self.limit.x)*self.zoom_factor;
+        let h = self.screen_size.h as f64 - (b+self.limit.y)*self.zoom_factor;
+        Vector2::new(w, h)
     }
 }
