@@ -18,10 +18,11 @@ impl Tunel {
 
     pub fn render(&self, camera: &Camera) -> Vec<([Vector2<f64>; 2], Color)> {
         vec![
-            camera.render_line(&Vector3::new(0., 0., 0.), &Vector3::new(0., 0., self.size.z)),
-            camera.render_line(&Vector3::new(self.size.x, 0., 0.), &Vector3::new(self.size.x, 0., self.size.z)),
-            camera.render_line(&Vector3::new(0., self.size.y, 0.), &Vector3::new(0., self.size.y, self.size.z)),
-            camera.render_line(&Vector3::new(self.size.x, self.size.y, 0.), &Vector3::new(self.size.x, self.size.y, self.size.z)),
-        ].into_iter().filter(|x| x.is_some()).map(|x| (x.unwrap(), self.color)).collect()
+            ((0., 0., 0.), (0., 0., self.size.z)),
+            ((self.size.x, 0., 0.), (self.size.x, 0., self.size.z)),
+            ((0., self.size.y, 0.), (0., self.size.y, self.size.z)),
+            ((self.size.x, self.size.y, 0.), (self.size.x, self.size.y, self.size.z)),
+        ].into_iter().map(|(a, b)| camera.render_line(&Vector3::from(a), &Vector3::from(b)))
+         .filter(|x| x.is_some()).map(|x| (x.unwrap(), self.color)).collect()
     }
 }
