@@ -93,10 +93,7 @@ impl Game {
         match key {
             Key::A => self.state.turn = Turn::Left,
             Key::D => self.state.turn = Turn::Right,
-            Key::W => if !self.state.sprint {
-                self.state.sprint = true;
-                self.world.player.speed *= self.config.sprint_factor;
-            },
+            Key::W => self.state.sprint = true,
             _ => (),
         }
     }
@@ -108,10 +105,7 @@ impl Game {
             Key::D => if let Turn::Right = self.state.turn {
                 self.state.turn = Turn::None;
             },
-            Key::W => if self.state.sprint {
-                self.state.sprint = false;
-                self.world.player.speed /= self.config.sprint_factor;
-            },
+            Key::W => self.state.sprint = false,
             _ => (),
         }
     }
@@ -125,6 +119,11 @@ impl Game {
         });
     }
     fn update(&mut self, dt: f64) {
+        if self.state.sprint {
+            self.world.player.speed += dt*self.config.sprint_factor;
+        } else if self.world.player.speed > self.config.player_speed {
+            self.world.player.speed -= dt*self.config.sprint_factor;
+        }
         self.state.spawn -= dt;
         if self.state.spawn < 0. {
             self.world.add_bot(&self.bot_rules);

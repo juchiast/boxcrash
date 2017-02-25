@@ -97,7 +97,7 @@ impl World {
             self.decor_state += self.decor_distance;
         }
         for ref mut x in &mut self.bots {
-            x.position.z -= dt*x.speed;
+            x.position.z -= dt*(x.speed+self.player.speed);
         }
     }
     pub fn validate(&mut self) {
