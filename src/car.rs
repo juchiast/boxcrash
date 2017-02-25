@@ -62,4 +62,14 @@ impl Car {
             Turn::None => (),
         }
     }
+    pub fn rear_z(&self) -> f64 {
+        self.position.z + self.size.z
+    }
+    pub fn crash(&self, a: &Car) -> bool {
+        (f64::abs(self.position.x - a.position.x) < (self.size.x+a.size.x)/2.) &&
+            ((self.position.z<a.position.z && a.position.z-self.position.z < self.size.z) ||
+             (self.position.z>=a.position.z && self.position.z-a.position.z < a.size.z)) &&
+            ((self.position.y<a.position.y && a.position.y-self.position.y < self.size.y) ||
+             (self.position.y>=a.position.y && self.position.y-a.position.y < a.size.y))
+    }
 }

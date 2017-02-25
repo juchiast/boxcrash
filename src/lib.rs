@@ -3,12 +3,8 @@ extern crate cgmath;
 extern crate piston_window;
 
 fn rnd((a, b): (f64, f64)) -> f64 {
-    use std::f64;
-    if a-b == 0. { a }
-    else {
-        let (a, b) = (f64::min(a, b), f64::max(a, b));
-        rand::random::<f64>()*(b-a) + a
-    }
+    let (a, b) = (f64::min(a, b), f64::max(a, b));
+    rand::random::<f64>()*(b-a) + a
 }
 
 #[derive(Clone)]

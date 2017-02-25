@@ -20,6 +20,7 @@ struct State {
     pub turn: Turn,
     pub sprint: bool,
     pub spawn: f64,
+    pub ended: bool,
 }
 pub enum Turn { Left, Right, None, }
 
@@ -66,6 +67,7 @@ impl Game {
             turn: Turn::None,
             sprint: false,
             spawn: 0.,
+            ended: false,
         };
         Game {
             config: config,
@@ -85,6 +87,9 @@ impl Game {
                 Input::Render(_) => self.draw(&e),
                 Input::Update(args) => self.update(args.dt),
                 _ => {}
+            }
+            if self.state.ended {
+                break;
             }
         }
     }
@@ -133,6 +138,11 @@ impl Game {
         self.world.update(dt);
         self.world.validate();
         self.camera.eye.x = self.world.player.position.x;
+        for ref x in &self.world.bots {
+            if self.world.player.crash(x) {
+                self.state.ended = true;
+            }
+        }
     }
 }
 

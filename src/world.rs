@@ -5,11 +5,12 @@ use color::*;
 use cgmath::{Vector2, Vector3};
 use game::GameConfig;
 use camera::Camera;
+use std::collections::VecDeque;
 
 pub struct World {
     pub tunel: Tunel,
     pub player: Car,
-    pub bots: Vec<Car>,
+    pub bots: VecDeque<Car>,
     pub divider: Vector2<f64>,
     pub decor_distance: f64,
     pub divider_state: f64,
@@ -17,37 +18,6 @@ pub struct World {
 }
 
 impl World {
-    pub fn new(config: &GameConfig) -> World {
-        let player = Car {
-            size: Vector3::from(config.player_size),
-            position: Vector3::new(config.tunel_size[0]/2., 0., 10.),
-            speed: config.player_speed,
-            turn_speed: config.player_turn_speed,
-            color: YELLOW,
-        };
-
-        World {
-            tunel: Tunel::new(config.tunel_size),
-            player: player,
-            bots: Vec::new(),
-            divider: Vector2::from(config.divider_size),
-            divider_state: config.divider_size[1],
-            decor_distance: config.decor_distance,
-            decor_state: config.decor_distance,
-        }
-    }
-
-    pub fn render(&self, camera: &Camera) -> Vec<([Vector2<f64>; 2], Color)> {
-        let mut ret = Vec::new();
-        ret.append(&mut self.tunel.render(camera));
-        ret.append(&mut self.divider_render(camera));
-        ret.append(&mut self.decor_render(camera));
-        ret.append(&mut self.player.render(camera));
-        for bot in &self.bots {
-            ret.append(&mut bot.render(camera));
-        }
-        ret
-    }
     fn divider_render(&self, camera: &Camera) -> Vec<([Vector2<f64>; 2], Color)> {
         let mut points = [Vector3::new(self.tunel.size.x/2., 0., self.divider_state); 4];
         points[2].z -= self.divider.y; points[3].z -= self.divider.y;
@@ -87,6 +57,38 @@ impl World {
         }
         ret
     }
+
+    pub fn new(config: &GameConfig) -> World {
+        let player = Car {
+            size: Vector3::from(config.player_size),
+            position: Vector3::new(config.tunel_size[0]/2., 0., 10.),
+            speed: config.player_speed,
+            turn_speed: config.player_turn_speed,
+            color: YELLOW,
+        };
+
+        World {
+            tunel: Tunel::new(config.tunel_size),
+            player: player,
+            bots: VecDeque::new(),
+            divider: Vector2::from(config.divider_size),
+            divider_state: config.divider_size[1],
+            decor_distance: config.decor_distance,
+            decor_state: config.decor_distance,
+        }
+    }
+
+    pub fn render(&self, camera: &Camera) -> Vec<([Vector2<f64>; 2], Color)> {
+        let mut ret = Vec::new();
+        ret.append(&mut self.tunel.render(camera));
+        ret.append(&mut self.divider_render(camera));
+        ret.append(&mut self.decor_render(camera));
+        ret.append(&mut self.player.render(camera));
+        for bot in &self.bots {
+            ret.append(&mut bot.render(camera));
+        }
+        ret
+    }
     pub fn update(&mut self, dt: f64) {
         self.divider_state -= dt*self.player.speed;
         if self.divider_state < 0. {
@@ -96,8 +98,20 @@ impl World {
         if self.decor_state < 0. {
             self.decor_state += self.decor_distance;
         }
-        for ref mut x in &mut self.bots {
-            x.position.z -= dt*(x.speed+self.player.speed);
+        for i in 0..self.bots.len() {
+            self.bots[i].position.z -= dt*(self.bots[i].speed + self.player.speed);
+            if i>0 {
+                let mut j = i-1;
+                while j>0 {
+                    if self.bots[j].position.z > self.bots[i].position.z {
+                        self.bots.swap(i, j);
+                        j -= 1;
+                    } else { break }
+                }
+            }
+        }
+        while !self.bots.is_empty() && self.bots.front().unwrap().rear_z() < 0. {
+            self.bots.pop_front();
         }
     }
     pub fn validate(&mut self) {
@@ -110,11 +124,24 @@ impl World {
             }
         };
         car(&mut self.player);
-        for ref mut x in &mut self.bots {
-            car(x);
+        if !self.bots.is_empty() {
+            for ref mut x in &mut self.bots {
+                car(x);
+            }
+            let mut len = self.bots.len();
+            let mut i = 0;
+            while i+1 < len {
+                if self.bots[i].crash(&self.bots[i+1]) {
+                    self.bots.remove(i+1);
+                    self.bots.remove(i);
+                    len = self.bots.len();
+                } else {
+                    i += 1;
+                }
+            }
         }
     }
     pub fn add_bot(&mut self, rules: &CarRules) {
-        self.bots.push(Car::new_random(rules));
+        self.bots.push_back(Car::new_random(rules));
     }
 }
