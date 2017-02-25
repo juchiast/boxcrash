@@ -20,11 +20,13 @@ type Color = [f32; 4];
 mod color {
     use Color;
     pub const BLACK: Color = [0.0, 0.0, 0.0, 1.0];
+    pub const GREEN: Color = [0.0, 1.0, 0.0, 1.0];
     pub const BLUE: Color = [0.0, 0.0, 1.0, 1.0];
     pub const ORANGE: Color = [1.0, 0.5, 0.0, 1.0];
     pub const RED: Color = [1.0, 0.0, 0.0, 1.0];
     pub const VIOLET: Color = [0.6, 0.0, 1.0, 1.0];
     pub const YELLOW: Color = [1.0, 1.0, 0.0, 1.0];
+    pub const PALE: Color = [0.3, 0.3, 0.3, 0.1];
 }
 
 mod world;

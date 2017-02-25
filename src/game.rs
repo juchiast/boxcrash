@@ -21,7 +21,9 @@ struct State {
     pub sprint: bool,
     pub spawn: f64,
     pub ended: bool,
+    pub game_speed: f64,
 }
+
 pub enum Turn { Left, Right, None, }
 
 pub struct GameConfig {
@@ -42,6 +44,8 @@ pub struct GameConfig {
     pub decor_distance: f64,
     pub sprint_factor: f64,
     pub spawn_time: (f64, f64),
+    pub game_sprint: f64,
+    pub game_max_speed: f64,
 }
 
 impl Game {
@@ -56,7 +60,7 @@ impl Game {
             position: [(0., config.tunel_size[0]), (0., 0.), (config.tunel_size[2], config.tunel_size[2])],
             speed: config.bot_speed,
             turn_speed: config.bot_turn_speed,
-            color: vec![RED, ORANGE, VIOLET],
+            color: vec![RED, ORANGE, VIOLET, GREEN, PALE],
         };
         let world = World::new(&config);
         let camera = Camera::new(config.screen_size.clone(),
@@ -68,6 +72,7 @@ impl Game {
             sprint: false,
             spawn: 0.,
             ended: false,
+            game_speed: 0.,
         };
         Game {
             config: config,
@@ -124,6 +129,9 @@ impl Game {
         });
     }
     fn update(&mut self, dt: f64) {
+        if self.state.game_speed < self.config.game_max_speed {
+            self.state.game_speed += dt*self.config.game_sprint;
+        }
         if self.state.sprint {
             if self.world.player.speed < self.config.player_speed.1 {
                 self.world.player.speed += dt*self.config.sprint_factor;
@@ -137,7 +145,7 @@ impl Game {
             self.state.spawn += rnd(self.config.spawn_time);
         }
         self.world.player.turn(&self.state.turn, dt);
-        self.world.update(dt);
+        self.world.update(dt, self.state.game_speed);
         self.world.validate();
         self.camera.eye.x = self.world.player.position.x;
         for ref x in &self.world.bots {

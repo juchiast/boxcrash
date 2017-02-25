@@ -89,17 +89,18 @@ impl World {
         }
         ret
     }
-    pub fn update(&mut self, dt: f64) {
-        self.divider_state -= dt*self.player.speed;
+    pub fn update(&mut self, dt: f64, game_speed: f64) {
+        let speed = game_speed + self.player.speed;
+        self.divider_state -= dt*speed;
         if self.divider_state < 0. {
             self.divider_state += 2.*self.divider.y;
         }
-        self.decor_state -= dt*self.player.speed;
+        self.decor_state -= dt*speed;
         if self.decor_state < 0. {
             self.decor_state += self.decor_distance;
         }
         for i in 0..self.bots.len() {
-            self.bots[i].position.z -= dt*(self.bots[i].speed + self.player.speed);
+            self.bots[i].position.z -= dt*(self.bots[i].speed + speed);
             if i>0 {
                 let mut j = i-1;
                 while j>0 {
