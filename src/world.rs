@@ -99,4 +99,11 @@ impl World {
             self.decor_state -= dt*self.player.speed;
         }
     }
+    pub fn validate(&mut self) {
+        if self.player.position.x + self.player.size.x/2. > self.tunel.size.x {
+            self.player.position.x = self.tunel.size.x - self.player.size.x/2.;
+        } else if self.player.position.x - self.player.size.x/2. < 0. {
+            self.player.position.x = self.player.size.x/2.;
+        }
+    }
 }

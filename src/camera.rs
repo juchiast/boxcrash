@@ -7,8 +7,7 @@ const MAX_CAM_WIDTH: f64 = 1.0;
 
 #[derive(Clone)]
 pub struct Camera {
-    centre: Vector3<f64>,
-    eye: Vector3<f64>,
+    pub eye: Vector3<f64>,
     c: Vector3<f64>,
     axis_x: Vector3<f64>,
     axis_y: Vector3<f64>,
@@ -20,7 +19,6 @@ impl Camera {
     pub fn new(size: Pixel, location: Vector3<f64>) -> Camera {
         let c = Vector3::new(0., 0., 0.5);
         Camera {
-            centre: location + c,
             eye: location,
             c: c,
             axis_x: Vector3::new(1.0, 0.0, 0.0),
@@ -31,7 +29,8 @@ impl Camera {
     }
 
     pub fn render(&self, x: &Vector3<f64>) -> Option<Vector2<f64>> {
-        let side = |x: &Vector3<f64>| self.c.dot(x-self.centre);
+        let centre = self.eye + self.c;
+        let side = |x: &Vector3<f64>| self.c.dot(x-centre);
         if side(&x)*side(&self.eye) > 0. {
             None
         } else {
@@ -41,6 +40,7 @@ impl Camera {
     }
 
     pub fn render_line(&self, x: &Vector3<f64>, y: &Vector3<f64>) -> Option<[Vector2<f64>; 2]> {
+        let centre = self.eye + self.c;
         let (x1, y1) = (self.render(x), self.render(y));
         if x1.is_some() && y1.is_some() {
             Some([x1.unwrap(), y1.unwrap()])
@@ -48,8 +48,8 @@ impl Camera {
             None
         } else {
             let (a, v) = if x1.is_some() { (x, y-x) } else { (y, x-y) };
-            let t = self.c.dot(self.centre-a) / self.c.dot(v);
-            let x = t*v + a - self.centre;
+            let t = self.c.dot(centre-a) / self.c.dot(v);
+            let x = t*v + a - centre;
             Some([
                  if x1.is_some(){x1.unwrap()} else {y1.unwrap()},
                  self.transform(&x)

@@ -3,6 +3,7 @@ use color::*;
 use cgmath::{Vector3, Vector2};
 use rand;
 use camera::Camera;
+use game::Turn;
 
 pub struct Car {
     pub size: Vector3<f64>,
@@ -51,6 +52,14 @@ impl Car {
             ret.push(camera.render_line(&front[i], &rear[i]));
         }
         ret.into_iter().filter(|x| x.is_some()).map(|x| (x.unwrap(), self.color)).collect()
+    }
+
+    pub fn turn(&mut self, turn: &Turn, dt: f64) {
+        match *turn {
+            Turn::Left => self.position.x -= dt*self.turn_speed,
+            Turn::Right => self.position.x += dt*self.turn_speed,
+            Turn::None => (),
+        }
     }
 }
 

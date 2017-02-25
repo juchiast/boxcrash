@@ -12,7 +12,14 @@ pub struct Game {
     window: PistonWindow,
     bot_rules: CarRules,
     camera: Camera,
+    state: State,
 }
+
+struct State {
+    pub turn: Turn,
+    pub sprint: bool,
+}
+pub enum Turn { Left, Right, None, }
 
 pub struct GameConfig {
     pub title: &'static str,
@@ -30,6 +37,7 @@ pub struct GameConfig {
     pub camera_height: f64,
     pub camera_distance: f64,
     pub decor_distance: f64,
+    pub sprint_factor: f64,
 }
 
 impl Game {
@@ -51,12 +59,17 @@ impl Game {
                                  Vector3::new(world.player.position.x,
                                               config.camera_height,
                                               world.player.position.z-config.camera_distance));
+        let state = State {
+            turn: Turn::None,
+            sprint: false,
+        };
         Game {
             config: config,
             world: world,
             window: window,
             bot_rules: bot_rules,
             camera: camera,
+            state: state,
         }
     }
 
@@ -72,8 +85,32 @@ impl Game {
         }
     }
 
-    fn key_press(&mut self, key: Key) {}
-    fn key_release(&mut self, key: Key) {}
+    fn key_press(&mut self, key: Key) {
+        match key {
+            Key::A => self.state.turn = Turn::Left,
+            Key::D => self.state.turn = Turn::Right,
+            Key::W => if !self.state.sprint {
+                self.state.sprint = true;
+                self.world.player.speed *= self.config.sprint_factor;
+            },
+            _ => (),
+        }
+    }
+    fn key_release(&mut self, key: Key) {
+        match key {
+            Key::A => if let Turn::Left = self.state.turn {
+                self.state.turn = Turn::None;
+            },
+            Key::D => if let Turn::Right = self.state.turn {
+                self.state.turn = Turn::None;
+            },
+            Key::W => if self.state.sprint {
+                self.state.sprint = false;
+                self.world.player.speed /= self.config.sprint_factor;
+            },
+            _ => (),
+        }
+    }
     fn draw(&mut self, e: &Input) {
         let lines = self.world.render(&self.camera);
         self.window.draw_2d(e, |c, g| {
@@ -84,7 +121,10 @@ impl Game {
         });
     }
     fn update(&mut self, dt: f64) {
+        self.world.player.turn(&self.state.turn, dt);
         self.world.update(dt);
+        self.world.validate();
+        self.camera.eye.x = self.world.player.position.x;
     }
 }
 
