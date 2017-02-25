@@ -11,7 +11,7 @@ fn main() {
         max_fps: 60,
         tunel_size: [15., 8., 100.],
         player_size: [1.5, 0.8, 3.],
-        player_speed: 20.,
+        player_speed: (20., 100.),
         player_turn_speed: 15.,
         bot_size: [(1., 2.), (0.5, 2.5), (2.5, 5.)],
         bot_speed: (20., 70.),

@@ -62,7 +62,7 @@ impl World {
         let player = Car {
             size: Vector3::from(config.player_size),
             position: Vector3::new(config.tunel_size[0]/2., 0., 10.),
-            speed: config.player_speed,
+            speed: config.player_speed.0,
             turn_speed: config.player_turn_speed,
             color: YELLOW,
         };

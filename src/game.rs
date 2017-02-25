@@ -31,7 +31,7 @@ pub struct GameConfig {
     pub max_fps: u64,
     pub tunel_size: [f64; 3],
     pub player_size: [f64; 3],
-    pub player_speed: f64,
+    pub player_speed: (f64, f64),
     pub player_turn_speed: f64,
     pub bot_size: [(f64, f64); 3],
     pub bot_speed: (f64, f64),
@@ -125,8 +125,10 @@ impl Game {
     }
     fn update(&mut self, dt: f64) {
         if self.state.sprint {
-            self.world.player.speed += dt*self.config.sprint_factor;
-        } else if self.world.player.speed > self.config.player_speed {
+            if self.world.player.speed < self.config.player_speed.1 {
+                self.world.player.speed += dt*self.config.sprint_factor;
+            }
+        } else if self.world.player.speed > self.config.player_speed.0 {
             self.world.player.speed -= dt*self.config.sprint_factor;
         }
         self.state.spawn -= dt;
