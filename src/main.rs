@@ -6,7 +6,7 @@ use boxcrash::Pixel;
 fn main() {
     let config = GameConfig {
         title: "Box Crash",
-        screen_size: Pixel::new(800, 600),
+        screen_size: Pixel::new(1366, 768),
         ups: 60,
         max_fps: 60,
         tunel_size: [15., 8., 100.],

@@ -19,21 +19,32 @@ pub struct World {
 
 impl World {
     fn divider_render(&self, camera: &Camera) -> Vec<([Vector2<f64>; 2], Color)> {
+        let color = self.tunel.color;
         let mut points = [Vector3::new(self.tunel.size.x/2., 0., self.divider_state); 4];
         points[2].z -= self.divider.y; points[3].z -= self.divider.y;
         points[0].x -= self.divider.x/2.; points[3].x -= self.divider.x/2.;
         points[1].x += self.divider.x/2.; points[2].x += self.divider.x/2.;
         
         let mut ret = Vec::new();
-        while points[0].z <= self.tunel.size.z {
-            for i in 0..4 {
-                if let Some(rendered) = camera.render_line(&points[i], &points[(i+1)%4]) {
-                    ret.push((rendered, self.tunel.color));
+        {
+            let mut r = |a: &Vector3<f64>, b: &Vector3<f64>| {
+                if let Some(rendered) = camera.render_line(a, b) {
+                    ret.push((rendered, color));
+                }
+            };
+            while points[0].z <= self.tunel.size.z {
+                for i in 0..4 {
+                    r(&points[i], &points[(i+1)%4]);
+                }
+                for i in 0..4 {
+                    points[i].z += 2.*self.divider.y;
                 }
             }
-            for i in 0..4 {
-                points[i].z += 2.*self.divider.y;
-            }
+            points[0].z = self.tunel.size.z;
+            points[1].z = self.tunel.size.z;
+            r(&points[0], &points[3]);
+            r(&points[1], &points[2]);
+            r(&points[2], &points[3]);
         }
         ret
     }
