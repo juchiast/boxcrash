@@ -12,6 +12,11 @@ pub struct Car {
     pub speed: f64,
     pub turn_speed: f64,
     pub color: Color,
+    pub jump_v: f64,
+    pub jump_a: f64,
+    pub jumping: bool,
+    pub current_t: f64,
+    pub jump_turn_decrease: f64,
 }
 
 pub struct CarRules {
@@ -20,6 +25,7 @@ pub struct CarRules {
     pub speed: (f64, f64),
     pub turn_speed: (f64, f64),
     pub color: Vec<Color>,
+    pub jump_turn_decrease: f64,
 }
 
 impl Car {
@@ -33,7 +39,12 @@ impl Car {
                 RED
             } else {
                 rules.color[rand::random::<usize>() % rules.color.len()]
-            }
+            },
+            jump_v: 0.,
+            jump_a: 0.,
+            jumping: false,
+            current_t: 0.,
+            jump_turn_decrease: rules.jump_turn_decrease,
         }
     }
 
@@ -56,9 +67,14 @@ impl Car {
     }
 
     pub fn turn(&mut self, turn: &Turn, dt: f64) {
+        let speed = if self.jumping {
+            self.turn_speed/self.jump_turn_decrease
+        } else {
+            self.turn_speed
+        };
         match *turn {
-            Turn::Left => self.position.x -= dt*self.turn_speed,
-            Turn::Right => self.position.x += dt*self.turn_speed,
+            Turn::Left => self.position.x -= dt*speed,
+            Turn::Right => self.position.x += dt*speed,
             Turn::None => (),
         }
     }
@@ -71,5 +87,22 @@ impl Car {
              (self.position.z>=a.position.z && self.position.z-a.position.z < a.size.z)) &&
             ((self.position.y<a.position.y && a.position.y-self.position.y < self.size.y) ||
              (self.position.y>=a.position.y && self.position.y-a.position.y < a.size.y))
+    }
+    pub fn start_jump(&mut self) {
+        if self.jumping || self.position.y > 0. {}
+        else {
+            self.jumping = true;
+            self.current_t = 0.;
+        }
+    }
+    pub fn update_jump(&mut self, dt: f64) {
+        if self.jumping {
+            self.current_t += dt;
+            self.position.y = self.current_t*(self.jump_v - 0.5*self.jump_a*self.current_t);
+            if self.position.y < 0. {
+                self.position.y = 0.;
+                self.jumping = false;
+            }
+        }
     }
 }

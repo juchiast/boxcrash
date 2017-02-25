@@ -76,6 +76,11 @@ impl World {
             speed: config.player_speed.0,
             turn_speed: config.player_turn_speed,
             color: YELLOW,
+            jump_v: config.player_jump_v,
+            jump_a: config.player_jump_a,
+            jumping: false,
+            current_t: 0.,
+            jump_turn_decrease: config.jump_turn_decrease,
         };
 
         World {
@@ -101,6 +106,7 @@ impl World {
         ret
     }
     pub fn update(&mut self, dt: f64, game_speed: f64) {
+        self.player.update_jump(dt);
         let speed = game_speed + self.player.speed;
         self.divider_state -= dt*speed;
         if self.divider_state < 0. {
@@ -127,12 +133,15 @@ impl World {
         }
     }
     pub fn validate(&mut self) {
-        let size = self.tunel.size.x;
+        let size = self.tunel.size;
         let car = |car: &mut Car| {
-            if car.position.x + car.size.x/2. > size {
-                car.position.x = size - car.size.x/2.;
+            if car.position.x + car.size.x/2. > size.x {
+                car.position.x = size.x - car.size.x/2.;
             } else if car.position.x - car.size.x/2. < 0. {
                 car.position.x = car.size.x/2.;
+            }
+            if car.position.y + car.size.y > size.y {
+                car.position.y = size.y - car.size.y;
             }
         };
         car(&mut self.player);

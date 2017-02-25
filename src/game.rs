@@ -22,6 +22,7 @@ struct State {
     pub spawn: f64,
     pub ended: bool,
     pub game_speed: f64,
+    pub jump_timeout: f64,
 }
 
 pub enum Turn { Left, Right, None, }
@@ -46,6 +47,10 @@ pub struct GameConfig {
     pub spawn_time: (f64, f64),
     pub game_sprint: f64,
     pub game_max_speed: f64,
+    pub player_jump_v: f64,
+    pub player_jump_a: f64,
+    pub jump_turn_decrease: f64,
+    pub jump_timeout: f64,
 }
 
 impl Game {
@@ -61,6 +66,7 @@ impl Game {
             speed: config.bot_speed,
             turn_speed: config.bot_turn_speed,
             color: vec![RED, ORANGE, VIOLET, GREEN, PALE],
+            jump_turn_decrease: config.jump_turn_decrease,
         };
         let world = World::new(&config);
         let camera = Camera::new(config.screen_size.clone(),
@@ -73,6 +79,7 @@ impl Game {
             spawn: 0.,
             ended: false,
             game_speed: 0.,
+            jump_timeout: 0.,
         };
         Game {
             config: config,
@@ -104,6 +111,10 @@ impl Game {
             Key::A => self.state.turn = Turn::Left,
             Key::D => self.state.turn = Turn::Right,
             Key::W => self.state.sprint = true,
+            Key::Space => if self.state.jump_timeout <= 0. {
+                self.state.jump_timeout = self.config.jump_timeout;
+                self.world.player.start_jump();
+            },
             _ => (),
         }
     }
@@ -121,14 +132,22 @@ impl Game {
     }
     fn draw(&mut self, e: &Input) {
         let lines = self.world.render(&self.camera);
+        let jump_bar = [
+            0.,
+            self.config.screen_size.h as f64 - 20.,
+            self.config.screen_size.w as f64/2.*self.state.jump_timeout/self.config.jump_timeout,
+            self.config.screen_size.h as f64,
+        ];
         self.window.draw_2d(e, |c, g| {
             clear(BLACK, g);
             for (l, color) in lines {
                 line(color, 1., convert(l), c.transform, g);
             }
+            rectangle(pale(BLUE, 0.4), jump_bar, c.transform, g);
         });
     }
     fn update(&mut self, dt: f64) {
+        self.state.jump_timeout -= dt;
         if self.state.game_speed < self.config.game_max_speed {
             self.state.game_speed += dt*self.config.game_sprint;
         }
@@ -148,6 +167,7 @@ impl Game {
         self.world.update(dt, self.state.game_speed);
         self.world.validate();
         self.camera.eye.x = self.world.player.position.x;
+        self.camera.eye.y = self.world.player.position.y + self.config.camera_height;
         for ref x in &self.world.bots {
             if self.world.player.crash(x) {
                 self.state.ended = true;

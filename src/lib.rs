@@ -27,6 +27,10 @@ mod color {
     pub const VIOLET: Color = [0.6, 0.0, 1.0, 1.0];
     pub const YELLOW: Color = [1.0, 1.0, 0.0, 1.0];
     pub const PALE: Color = [0.3, 0.3, 0.3, 0.1];
+    pub fn pale(mut c: Color, f: f32) -> Color {
+        c[3] = f;
+        c
+    }
 }
 
 mod world;

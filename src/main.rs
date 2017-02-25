@@ -24,6 +24,10 @@ fn main() {
         spawn_time: (0.25, 1.),
         game_sprint: 1.,
         game_max_speed: 60.,
+        player_jump_v: 6.,
+        player_jump_a: 5.,
+        jump_turn_decrease: 3.,
+        jump_timeout: 8.,
     };
     Game::new(config).run();
 }
