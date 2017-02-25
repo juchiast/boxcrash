@@ -5,6 +5,7 @@ use car::CarRules;
 use camera::Camera;
 use cgmath::{Vector3, Vector2};
 use color::*;
+use rnd;
 
 pub struct Game {
     config: GameConfig,
@@ -18,6 +19,7 @@ pub struct Game {
 struct State {
     pub turn: Turn,
     pub sprint: bool,
+    pub spawn: f64,
 }
 pub enum Turn { Left, Right, None, }
 
@@ -38,6 +40,7 @@ pub struct GameConfig {
     pub camera_distance: f64,
     pub decor_distance: f64,
     pub sprint_factor: f64,
+    pub spawn_time: (f64, f64),
 }
 
 impl Game {
@@ -49,10 +52,10 @@ impl Game {
         window.set_max_fps(config.max_fps);
         let bot_rules = CarRules {
             size: config.bot_size,
-            position: [(0., config.tunel_size[0]), (0., 0.), (0., config.tunel_size[2])],
+            position: [(0., config.tunel_size[0]), (0., 0.), (config.tunel_size[2], config.tunel_size[2])],
             speed: config.bot_speed,
             turn_speed: config.bot_turn_speed,
-            color: Vec::new(),
+            color: vec![RED, ORANGE, VIOLET],
         };
         let world = World::new(&config);
         let camera = Camera::new(config.screen_size.clone(),
@@ -62,6 +65,7 @@ impl Game {
         let state = State {
             turn: Turn::None,
             sprint: false,
+            spawn: 0.,
         };
         Game {
             config: config,
@@ -121,6 +125,11 @@ impl Game {
         });
     }
     fn update(&mut self, dt: f64) {
+        self.state.spawn -= dt;
+        if self.state.spawn < 0. {
+            self.world.add_bot(&self.bot_rules);
+            self.state.spawn += rnd(self.config.spawn_time);
+        }
         self.world.player.turn(&self.state.turn, dt);
         self.world.update(dt);
         self.world.validate();

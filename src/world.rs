@@ -1,5 +1,5 @@
 use tunel::Tunel;
-use car::Car;
+use car::{CarRules, Car};
 use Color;
 use color::*;
 use cgmath::{Vector2, Vector3};
@@ -88,22 +88,33 @@ impl World {
         ret
     }
     pub fn update(&mut self, dt: f64) {
+        self.divider_state -= dt*self.player.speed;
         if self.divider_state < 0. {
             self.divider_state += 2.*self.divider.y;
-        } else {
-            self.divider_state -= dt*self.player.speed;
         }
+        self.decor_state -= dt*self.player.speed;
         if self.decor_state < 0. {
             self.decor_state += self.decor_distance;
-        } else {
-            self.decor_state -= dt*self.player.speed;
+        }
+        for ref mut x in &mut self.bots {
+            x.position.z -= dt*x.speed;
         }
     }
     pub fn validate(&mut self) {
-        if self.player.position.x + self.player.size.x/2. > self.tunel.size.x {
-            self.player.position.x = self.tunel.size.x - self.player.size.x/2.;
-        } else if self.player.position.x - self.player.size.x/2. < 0. {
-            self.player.position.x = self.player.size.x/2.;
+        let size = self.tunel.size.x;
+        let car = |car: &mut Car| {
+            if car.position.x + car.size.x/2. > size {
+                car.position.x = size - car.size.x/2.;
+            } else if car.position.x - car.size.x/2. < 0. {
+                car.position.x = car.size.x/2.;
+            }
+        };
+        car(&mut self.player);
+        for ref mut x in &mut self.bots {
+            car(x);
         }
+    }
+    pub fn add_bot(&mut self, rules: &CarRules) {
+        self.bots.push(Car::new_random(rules));
     }
 }

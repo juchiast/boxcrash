@@ -1,9 +1,10 @@
 use Color;
 use color::*;
 use cgmath::{Vector3, Vector2};
-use rand;
 use camera::Camera;
 use game::Turn;
+use rnd;
+use rand;
 
 pub struct Car {
     pub size: Vector3<f64>,
@@ -25,11 +26,11 @@ impl Car {
     pub fn new_random(rules: &CarRules) -> Car {
         Car {
             size: Vector3::new(rnd(rules.size[0]), rnd(rules.size[1]), rnd(rules.size[2])),
-            position: Vector3::new(rnd(rules.size[0]), rnd(rules.size[1]), rnd(rules.size[2])),
+            position: Vector3::new(rnd(rules.position[0]), rnd(rules.position[1]), rnd(rules.position[2])),
             speed: rnd(rules.speed),
             turn_speed: rnd(rules.turn_speed),
             color: if rules.color.is_empty() {
-                BLUE
+                RED
             } else {
                 rules.color[rand::random::<usize>() % rules.color.len()]
             }
@@ -60,14 +61,5 @@ impl Car {
             Turn::Right => self.position.x += dt*self.turn_speed,
             Turn::None => (),
         }
-    }
-}
-
-fn rnd((a, b): (f64, f64)) -> f64 {
-    use std::f64;
-    if a-b == 0. { a }
-    else {
-        let (a, b) = (f64::min(a, b), f64::max(a, b));
-        rand::random::<f64>()%(b-a) + a
     }
 }
