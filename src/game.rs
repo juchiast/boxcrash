@@ -7,6 +7,7 @@ use cgmath::{Vector3, Vector2};
 use color::*;
 use rnd;
 use car::Car;
+use piston_window::Ellipse;
 
 pub struct Game {
     config: GameConfig,
@@ -168,6 +169,25 @@ impl Game {
             }
             rectangle(pale(BLUE, 0.4), jump_bar, c.transform, g);
         });
+
+        if self.state.rotate_cam {
+            let w = 20.;
+            let x = self.config.screen_size.w as f64 /2. - w/2.;
+            let y = self.config.screen_size.h as f64 /2. - w/2.;
+            self.window.draw_2d(e, |c, g| {
+                let e = Ellipse {
+                    color: pale(BLACK, 0.),
+                    border: Some(ellipse::Border {
+                        color: pale(RED, 0.5),
+                        radius: 1.,
+                    }),
+                    resolution: 360,
+                };
+                e.draw([x, y, w, w], &c.draw_state, c.transform, g);
+                rectangle(RED, [x+w/2.-1., y+w/2.-1., 2., 2.], c.transform, g);
+            });
+        }
+
     }
     fn update(&mut self, dt: f64) {
         let old = self.world.player.position;

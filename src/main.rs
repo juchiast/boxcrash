@@ -7,7 +7,7 @@ use std::f64::consts::PI;
 fn main() {
     let config = GameConfig {
         title: "Box Crash",
-        screen_size: Pixel::new(800, 600),
+        screen_size: Pixel::new(1366, 768),
         ups: 60,
         max_fps: 60,
         tunel_size: [15., 8., 150.],
@@ -29,7 +29,7 @@ fn main() {
         player_jump_a: 5.,
         jump_turn_decrease: 3.,
         jump_timeout: 8.,
-        mouse_speed: PI/240.,
+        mouse_speed: PI/300.,
     };
     Game::new(config).run();
 }
