@@ -98,10 +98,13 @@ impl Game {
                 Input::Release(Button::Keyboard(key)) => self.key_release(key),
                 Input::Render(_) => self.draw(&e),
                 Input::Update(args) => self.update(args.dt),
+                Input::Move(Motion::MouseRelative(a, b)) => {
+                    println!("{}, {}", a, b);
+                },
                 _ => {}
             }
             if self.state.ended {
-                break;
+//                break;
             }
         }
     }
@@ -173,6 +176,7 @@ impl Game {
                 self.state.ended = true;
             }
         }
+        self.camera.test();
     }
 }
 

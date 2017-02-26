@@ -67,4 +67,25 @@ impl Camera {
         let h = self.screen_size.h as f64 - (b*self.zoom_factor+self.screen_size.h as f64 / 2.);
         Vector2::new(w, h)
     }
+
+    pub fn test(&mut self) {
+        use std::f64;
+        let rotate_y = |v: Vector3<f64>, t: f64| -> Vector3<f64> {
+            let sin = f64::sin(t);
+            let cos = f64::cos(t);
+            Vector3::new(v.x*cos + v.z*sin, v.y, -v.x*sin + v.z*cos)
+        };
+        let rotate_x = |v: Vector3<f64>, t: f64| -> Vector3<f64> {
+            let sin = f64::sin(t);
+            let cos = f64::cos(t);
+            Vector3::new(v.x, v.y*cos - v.z*sin, v.y*sin + v.z*cos)
+        };
+        let x = f64::consts::PI/120.;
+        self.c = rotate_y(self.c, x);
+        self.axis_x = rotate_y(self.axis_x, x);
+        self.axis_y = rotate_y(self.axis_y, x);
+        self.c = rotate_x(self.c, x);
+        self.axis_x = rotate_x(self.axis_x, x);
+        self.axis_y = rotate_x(self.axis_y, x);
+    }
 }
