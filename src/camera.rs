@@ -68,24 +68,15 @@ impl Camera {
         Vector2::new(w, h)
     }
 
-    pub fn test(&mut self) {
-        use std::f64;
-        let rotate_y = |v: Vector3<f64>, t: f64| -> Vector3<f64> {
-            let sin = f64::sin(t);
-            let cos = f64::cos(t);
-            Vector3::new(v.x*cos + v.z*sin, v.y, -v.x*sin + v.z*cos)
-        };
-        let rotate_x = |v: Vector3<f64>, t: f64| -> Vector3<f64> {
-            let sin = f64::sin(t);
-            let cos = f64::cos(t);
-            Vector3::new(v.x, v.y*cos - v.z*sin, v.y*sin + v.z*cos)
-        };
-        let x = f64::consts::PI/120.;
-        self.c = rotate_y(self.c, x);
-        self.axis_x = rotate_y(self.axis_x, x);
-        self.axis_y = rotate_y(self.axis_y, x);
-        self.c = rotate_x(self.c, x);
-        self.axis_x = rotate_x(self.axis_x, x);
-        self.axis_y = rotate_x(self.axis_y, x);
+    pub fn rotate(&mut self, y: f64, x: f64, centre: Vector3<f64>) {
+        use cgmath::{Basis3, Rotation3, Rad};
+        let mut vec = self.eye - centre;
+        let rotate_x = Basis3::from_angle_x(Rad(x));
+        let rotate_y = Basis3::from_angle_y(Rad(y));
+        for v in vec![&mut self.c, &mut self.axis_x, &mut self.axis_y, &mut vec] {
+            *v = rotate_x.rotate_vector(*v);
+            *v = rotate_y.rotate_vector(*v);
+        }
+        self.eye = centre + vec;
     }
 }

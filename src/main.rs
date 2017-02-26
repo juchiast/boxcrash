@@ -2,6 +2,7 @@ extern crate boxcrash;
 
 use boxcrash::game::{Game, GameConfig};
 use boxcrash::Pixel;
+use std::f64::consts::PI;
 
 fn main() {
     let config = GameConfig {
@@ -28,6 +29,7 @@ fn main() {
         player_jump_a: 5.,
         jump_turn_decrease: 3.,
         jump_timeout: 8.,
+        mouse_speed: PI/240.,
     };
     Game::new(config).run();
 }

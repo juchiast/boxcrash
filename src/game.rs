@@ -6,6 +6,7 @@ use camera::Camera;
 use cgmath::{Vector3, Vector2};
 use color::*;
 use rnd;
+use car::Car;
 
 pub struct Game {
     config: GameConfig,
@@ -23,6 +24,7 @@ struct State {
     pub ended: bool,
     pub game_speed: f64,
     pub jump_timeout: f64,
+    pub rotate_cam: bool,
 }
 
 pub enum Turn { Left, Right, None, }
@@ -51,6 +53,7 @@ pub struct GameConfig {
     pub player_jump_a: f64,
     pub jump_turn_decrease: f64,
     pub jump_timeout: f64,
+    pub mouse_speed: f64,
 }
 
 impl Game {
@@ -60,6 +63,7 @@ impl Game {
             .exit_on_esc(true).build().unwrap();
         window.set_ups(config.ups);
         window.set_max_fps(config.max_fps);
+        window.set_capture_cursor(true);
         let bot_rules = CarRules {
             size: config.bot_size,
             position: [(0., config.tunel_size[0]), (0., 0.), (config.tunel_size[2], config.tunel_size[2])],
@@ -69,10 +73,7 @@ impl Game {
             jump_turn_decrease: config.jump_turn_decrease,
         };
         let world = World::new(&config);
-        let camera = Camera::new(config.screen_size.clone(),
-                                 Vector3::new(world.player.position.x,
-                                              config.camera_height,
-                                              world.player.position.z-config.camera_distance));
+        let camera = Game::new_camera(&config, &world.player);
         let state = State {
             turn: Turn::None,
             sprint: false,
@@ -80,6 +81,7 @@ impl Game {
             ended: false,
             game_speed: 0.,
             jump_timeout: 0.,
+            rotate_cam: false,
         };
         Game {
             config: config,
@@ -91,45 +93,60 @@ impl Game {
         }
     }
 
+    fn new_camera(config: &GameConfig, player: &Car) -> Camera {
+        Camera::new(config.screen_size.clone(),
+        Vector3::new(player.position.x,
+                     config.camera_height,
+                     player.position.z-config.camera_distance))
+    }
+
     pub fn run(&mut self) {
         while let Some(e) = self.window.next() {
             match e {
-                Input::Press(Button::Keyboard(key)) => self.key_press(key),
-                Input::Release(Button::Keyboard(key)) => self.key_release(key),
+                Input::Press(key) => self.press(key),
+                Input::Release(key) => self.release(key),
                 Input::Render(_) => self.draw(&e),
                 Input::Update(args) => self.update(args.dt),
-                Input::Move(Motion::MouseRelative(a, b)) => {
-                    println!("{}, {}", a, b);
-                },
+                Input::Move(Motion::MouseRelative(a, b)) => self.mouse_move(a as f64, b as f64),
                 _ => {}
             }
             if self.state.ended {
-//                break;
+                break;
             }
         }
     }
 
-    fn key_press(&mut self, key: Key) {
+    fn mouse_move(&mut self, x: f64, y: f64) {
+        if self.state.rotate_cam {
+            self.camera.rotate(x*self.config.mouse_speed, y*self.config.mouse_speed, self.world.player.position);
+        }
+    }
+    fn press(&mut self, key: Button) {
         match key {
-            Key::A => self.state.turn = Turn::Left,
-            Key::D => self.state.turn = Turn::Right,
-            Key::W => self.state.sprint = true,
-            Key::Space => if self.state.jump_timeout <= 0. {
+            Button::Keyboard(Key::A) => self.state.turn = Turn::Left,
+            Button::Keyboard(Key::D) => self.state.turn = Turn::Right,
+            Button::Keyboard(Key::W) => self.state.sprint = true,
+            Button::Keyboard(Key::Space) => if self.state.jump_timeout <= 0. {
                 self.state.jump_timeout = self.config.jump_timeout;
                 self.world.player.start_jump();
             },
+            Button::Mouse(MouseButton::Right) => self.state.rotate_cam = true,
             _ => (),
         }
     }
-    fn key_release(&mut self, key: Key) {
+    fn release(&mut self, key: Button) {
         match key {
-            Key::A => if let Turn::Left = self.state.turn {
+            Button::Keyboard(Key::A) => if let Turn::Left = self.state.turn {
                 self.state.turn = Turn::None;
             },
-            Key::D => if let Turn::Right = self.state.turn {
+            Button::Keyboard(Key::D) => if let Turn::Right = self.state.turn {
                 self.state.turn = Turn::None;
             },
-            Key::W => self.state.sprint = false,
+            Button::Keyboard(Key::W) => self.state.sprint = false,
+            Button::Mouse(MouseButton::Right) => {
+                self.state.rotate_cam = false;
+                self.camera = Game::new_camera(&self.config, &self.world.player);
+            },
             _ => (),
         }
     }
@@ -150,6 +167,7 @@ impl Game {
         });
     }
     fn update(&mut self, dt: f64) {
+        let old = self.world.player.position;
         self.state.jump_timeout -= dt;
         if self.state.game_speed < self.config.game_max_speed {
             self.state.game_speed += dt*self.config.game_sprint;
@@ -169,14 +187,12 @@ impl Game {
         self.world.player.turn(&self.state.turn, dt);
         self.world.update(dt, self.state.game_speed);
         self.world.validate();
-        self.camera.eye.x = self.world.player.position.x;
-        self.camera.eye.y = self.world.player.position.y + self.config.camera_height;
+        self.camera.eye += self.world.player.position - old;
         for ref x in &self.world.bots {
             if self.world.player.crash(x) {
                 self.state.ended = true;
             }
         }
-        self.camera.test();
     }
 }
 
