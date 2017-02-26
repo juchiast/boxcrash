@@ -79,4 +79,8 @@ impl Camera {
         }
         self.eye = centre + vec;
     }
+
+    pub fn zoom_in(&mut self) {
+        self.c *= 2.;
+    }
 }

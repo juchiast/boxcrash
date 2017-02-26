@@ -130,7 +130,10 @@ impl Game {
                 self.state.jump_timeout = self.config.jump_timeout;
                 self.world.player.start_jump();
             },
-            Button::Mouse(MouseButton::Right) => self.state.rotate_cam = true,
+            Button::Mouse(MouseButton::Right) => {
+                self.camera.zoom_in();
+                self.state.rotate_cam = true;
+            },
             _ => (),
         }
     }
