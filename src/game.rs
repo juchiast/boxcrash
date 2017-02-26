@@ -4,6 +4,7 @@ use piston_window::*;
 use car::CarRules;
 use camera::Camera;
 use cgmath::{Vector3, Vector2};
+use cgmath::prelude::*;
 use color::*;
 use rnd;
 use car::Car;
@@ -26,6 +27,8 @@ struct State {
     pub game_speed: f64,
     pub jump_timeout: f64,
     pub rotate_cam: bool,
+    pub bullets: i64,
+    pub recharge: f64,
 }
 
 pub enum Turn { Left, Right, None, }
@@ -55,6 +58,11 @@ pub struct GameConfig {
     pub jump_turn_decrease: f64,
     pub jump_timeout: f64,
     pub mouse_speed: f64,
+    pub trueshot_distance: f64,
+    pub bullet_stock: i64,
+    pub recharge_time: f64,
+    pub bullet_len: f64,
+    pub bullet_speed: f64,
 }
 
 impl Game {
@@ -83,6 +91,8 @@ impl Game {
             game_speed: 0.,
             jump_timeout: 0.,
             rotate_cam: false,
+            bullets: config.bullet_stock,
+            recharge: 0.,
         };
         Game {
             config: config,
@@ -135,6 +145,19 @@ impl Game {
                 self.camera.zoom_in();
                 self.state.rotate_cam = true;
             },
+            Button::Mouse(MouseButton::Left) => if self.state.rotate_cam && self.state.bullets > 0 {
+                let mut pos = self.world.player.position;
+                pos.y += self.world.player.size.y;
+                let mut d = Vector3::new(0., 0., self.config.trueshot_distance + self.config.camera_distance);
+                d = self.camera.c * d.magnitude2() / d.dot(self.camera.c);
+                d = self.camera.eye + d - pos;
+                d = d * self.config.bullet_speed / d.magnitude();
+                self.world.add_bullet(pos, d, self.config.bullet_len);
+                self.state.bullets -= 1;
+                if self.state.bullets <= 0 {
+                    self.state.recharge = self.config.recharge_time;
+                }
+            },
             _ => (),
         }
     }
@@ -162,12 +185,19 @@ impl Game {
             self.config.screen_size.w as f64/2.*self.state.jump_timeout/self.config.jump_timeout,
             self.config.screen_size.h as f64,
         ];
+        let recharge_bar = [
+            0.,
+            self.config.screen_size.h as f64 - 20.,
+            self.config.screen_size.w as f64/2.*self.state.recharge/self.config.recharge_time,
+            self.config.screen_size.h as f64,
+        ];
         self.window.draw_2d(e, |c, g| {
             clear(BLACK, g);
             for (l, color) in lines {
                 line(color, 1., convert(l), c.transform, g);
             }
             rectangle(pale(BLUE, 0.4), jump_bar, c.transform, g);
+            rectangle(pale(RED, 0.4), recharge_bar, c.transform, g);
         });
 
         if self.state.rotate_cam {
@@ -191,6 +221,12 @@ impl Game {
     }
     fn update(&mut self, dt: f64) {
         let old = self.world.player.position;
+        if self.state.bullets <= 0 {
+            self.state.recharge -= dt;
+            if self.state.recharge < 0. {
+                self.state.bullets = self.config.bullet_stock;
+            }
+        }
         self.state.jump_timeout -= dt;
         if self.state.game_speed < self.config.game_max_speed {
             self.state.game_speed += dt*self.config.game_sprint;

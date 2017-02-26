@@ -30,6 +30,11 @@ fn main() {
         jump_turn_decrease: 3.,
         jump_timeout: 8.,
         mouse_speed: PI/300.,
+        trueshot_distance: 50.,
+        bullet_stock: 3,
+        recharge_time: 5.,
+        bullet_len: 2.,
+        bullet_speed: 80.,
     };
     Game::new(config).run();
 }

@@ -1,6 +1,6 @@
 use std::f64;
-use cgmath::prelude::*;
 use cgmath::{Vector2, Vector3};
+use cgmath::prelude::*;
 use Pixel;
 
 const MAX_CAM_WIDTH: f64 = 1.0; 
@@ -8,7 +8,7 @@ const MAX_CAM_WIDTH: f64 = 1.0;
 #[derive(Clone)]
 pub struct Camera {
     pub eye: Vector3<f64>,
-    c: Vector3<f64>,
+    pub c: Vector3<f64>,
     axis_x: Vector3<f64>,
     axis_y: Vector3<f64>,
     zoom_factor: f64,

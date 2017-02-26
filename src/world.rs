@@ -3,6 +3,7 @@ use car::{CarRules, Car};
 use Color;
 use color::*;
 use cgmath::{Vector2, Vector3};
+use cgmath::prelude::*;
 use game::GameConfig;
 use camera::Camera;
 use std::collections::VecDeque;
@@ -15,6 +16,7 @@ pub struct World {
     pub decor_distance: f64,
     pub divider_state: f64,
     pub decor_state: f64,
+    pub bullets: Vec<[Vector3<f64>; 3]>,
 }
 
 impl World {
@@ -91,6 +93,7 @@ impl World {
             divider_state: config.divider_size[1],
             decor_distance: config.decor_distance,
             decor_state: config.decor_distance,
+            bullets: Vec::new(),
         }
     }
 
@@ -102,6 +105,11 @@ impl World {
         ret.append(&mut self.player.render(camera));
         for bot in &self.bots {
             ret.append(&mut bot.render(camera));
+        }
+        for x in &self.bullets {
+            if let Some(rendered) = camera.render_line(&x[0], &(x[0]+x[1])) {
+                ret.push((rendered, self.player.color));
+            }
         }
         ret
     }
@@ -128,8 +136,8 @@ impl World {
                 }
             }
         }
-        while !self.bots.is_empty() && self.bots.front().unwrap().rear_z() < 0. {
-            self.bots.pop_front();
+        for ref mut x in &mut self.bullets {
+            x[0] += dt*x[2];
         }
     }
     pub fn validate(&mut self) {
@@ -161,8 +169,18 @@ impl World {
                 }
             }
         }
+        while !self.bots.is_empty() && self.bots.front().unwrap().rear_z() < 0. {
+            self.bots.pop_front();
+        }
     }
     pub fn add_bot(&mut self, rules: &CarRules) {
         self.bots.push_back(Car::new_random(rules));
+    }
+    pub fn add_bullet(&mut self, origin: Vector3<f64>, direction: Vector3<f64>, len: f64) {
+        self.bullets.push([
+            origin,
+            direction*len/direction.magnitude(),
+            direction,
+        ]);
     }
 }
