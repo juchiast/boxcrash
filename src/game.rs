@@ -8,6 +8,7 @@ use color::*;
 use rnd;
 use car::*;
 use piston_window::Ellipse;
+use bot::BoxRules;
 
 pub struct Game {
     config: GameConfig,

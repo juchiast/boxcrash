@@ -13,32 +13,72 @@ pub enum Action {
     TurnRight(f64),
 }
 
+pub struct BoxRules {
+    pub size: [(f64, f64); 3],
+    pub position: [(f64, f64); 3],
+    pub speed: (f64, f64),
+    pub turn_speed: (f64, f64),
+    pub color: Vec<Color>,
+    pub jump_turn_decrease: f64,
+}
+
 pub struct Bot {
     pub car: BoxCar,
     pub actions: Vec<Action>,
 }
 
+impl Action {
+    fn rand() -> Action {
+        match rand::random::<usize>() % 4 {
+            0 => Action::Rest(rnd((0.25, 1.))),
+            1 => Action::TurnLeft(rnd((0.25, 1.))),
+            2 => Action::TurnRight(rnd((0.25, 1.))),
+            3 => Action::Jump,
+            _ => panic!("Unexpected error in `Action::rand()`"),
+        }
+    }
+}
+
 impl Bot {
-     pub fn new_random(rules: &BoxRules) -> Bot {
-         Bot{
-             car: BoxCar {
-                 size: Vector3::new(rnd(rules.size[0]), rnd(rules.size[1]), rnd(rules.size[2])),
-                 position: Vector3::new(rnd(rules.position[0]), rnd(rules.position[1]), rnd(rules.position[2])),
-                 speed: rnd(rules.speed),
-                 turn_speed: rnd(rules.turn_speed),
-                 color: if rules.color.is_empty() {
-                     RED
-                 } else {
-                     rules.color[rand::random::<usize>() % rules.color.len()]
-                 },
-                 jump_v: 0.,
-                 jump_a: 0.,
-                 jumping: false,
-                 current_t: 0.,
-                 jump_turn_decrease: rules.jump_turn_decrease,
-             },
-             actions: Vec::new(),
-         }
+    pub fn new_random(rules: &BoxRules) -> Bot {
+        Bot{
+            car: BoxCar {
+                size: Vector3::new(rnd(rules.size[0]), rnd(rules.size[1]), rnd(rules.size[2])),
+                position: Vector3::new(rnd(rules.position[0]), rnd(rules.position[1]), rnd(rules.position[2])),
+                speed: rnd(rules.speed),
+                turn_speed: rnd(rules.turn_speed),
+                color: if rules.color.is_empty() {
+                    RED
+                } else {
+                    rules.color[rand::random::<usize>() % rules.color.len()]
+                },
+                jump_v: 5.,
+                jump_a: 7.,
+                jumping: false,
+                current_t: 0.,
+                jump_turn_decrease: rules.jump_turn_decrease,
+            },
+            actions: (0..rand::random::<usize>()%6).map(|_| Action::rand()).collect(),
+        }
+    }
+    pub fn drive(&mut self, dt: f64) {
+        if self.actions.is_empty() {
+            return;
+        }
+        match self.actions.pop().unwrap() {
+            Action::Jump => self.car.jump(),
+            Action::TurnRight(t) => if t > 0. {
+                self.car.turn_right(dt);
+                self.actions.push(Action::TurnRight(t - dt));
+            },
+            Action::TurnLeft(t) => if t > 0. {
+                self.car.turn_left(dt);
+                self.actions.push(Action::TurnLeft(t - dt));
+            },
+            Action::Rest(t) => if t > 0. {
+                self.actions.push(Action::Rest(t - dt));
+            },
+        }
     }
 }
 

@@ -7,7 +7,7 @@ use cgmath::prelude::*;
 use game::GameConfig;
 use camera::Camera;
 use std::collections::VecDeque;
-use bot::Bot;
+use bot::{Bot, BoxRules};
 
 pub struct World {
     pub tunel: Tunel,
@@ -124,6 +124,9 @@ impl World {
         self.decor_state -= dt*speed;
         if self.decor_state < 0. {
             self.decor_state += self.decor_distance;
+        }
+        for ref mut x in &mut self.bots {
+            x.drive(dt);
         }
         for i in 0..self.bots.len() {
             self.bots[i].forward(dt, speed);

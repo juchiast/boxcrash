@@ -28,14 +28,6 @@ pub struct BoxCar {
     pub jump_turn_decrease: f64,
 }
 
-pub struct BoxRules {
-    pub size: [(f64, f64); 3],
-    pub position: [(f64, f64); 3],
-    pub speed: (f64, f64),
-    pub turn_speed: (f64, f64),
-    pub color: Vec<Color>,
-    pub jump_turn_decrease: f64,
-}
 
 impl Car for BoxCar {
     fn render(&self, camera: &Camera) -> Vec<([Vector2<f64>; 2], Color)> {
