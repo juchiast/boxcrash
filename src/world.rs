@@ -7,11 +7,12 @@ use cgmath::prelude::*;
 use game::GameConfig;
 use camera::Camera;
 use std::collections::VecDeque;
+use bot::Bot;
 
 pub struct World {
     pub tunel: Tunel,
     pub player: Car,
-    pub bots: VecDeque<Car>,
+    pub bots: VecDeque<Bot>,
     pub divider: Vector2<f64>,
     pub decor_distance: f64,
     pub divider_state: f64,
@@ -104,7 +105,7 @@ impl World {
         ret.append(&mut self.decor_render(camera));
         ret.append(&mut self.player.render(camera));
         for bot in &self.bots {
-            ret.append(&mut bot.render(camera));
+            ret.append(&mut bot.car.render(camera));
         }
         for x in &self.bullets {
             if let Some(rendered) = camera.render_line(&x[0], &(x[0]+x[1])) {
@@ -125,11 +126,11 @@ impl World {
             self.decor_state += self.decor_distance;
         }
         for i in 0..self.bots.len() {
-            self.bots[i].position.z -= dt*(self.bots[i].speed + speed);
+            self.bots[i].car.position.z -= dt*(self.bots[i].car.speed + speed);
             if i>0 {
                 let mut j = i-1;
                 while j>0 {
-                    if self.bots[j].position.z > self.bots[i].position.z {
+                    if self.bots[j].car.position.z > self.bots[i].car.position.z {
                         self.bots.swap(i, j);
                         j -= 1;
                     } else { break }
@@ -155,12 +156,12 @@ impl World {
         car(&mut self.player);
         if !self.bots.is_empty() {
             for ref mut x in &mut self.bots {
-                car(x);
+                car(&mut x.car);
             }
             let mut len = self.bots.len();
             let mut i = 0;
             while i+1 < len {
-                if self.bots[i].crash(&self.bots[i+1]) {
+                if self.bots[i].car.crash(&self.bots[i+1].car) {
                     self.bots.remove(i+1);
                     self.bots.remove(i);
                     len = self.bots.len();
@@ -170,7 +171,7 @@ impl World {
             }
             i = 0;
             while i<len {
-                if self.bullets.iter().any(|x| self.bots[i].hit(x)) {
+                if self.bullets.iter().any(|x| self.bots[i].car.hit(x)) {
                     self.bots.remove(i);
                     len = self.bots.len();
                 } else {
@@ -178,7 +179,7 @@ impl World {
                 }
             }
         }
-        while !self.bots.is_empty() && self.bots.front().unwrap().rear_z() < 0. {
+        while !self.bots.is_empty() && self.bots.front().unwrap().car.rear_z() < 0. {
             self.bots.pop_front();
         }
         self.bullets = self.bullets.clone().into_iter().filter(|x| {
@@ -189,7 +190,7 @@ impl World {
         }).collect();
     }
     pub fn add_bot(&mut self, rules: &CarRules) {
-        self.bots.push_back(Car::new_random(rules));
+        self.bots.push_back(Bot::new_random(rules));
     }
     pub fn add_bullet(&mut self, origin: Vector3<f64>, direction: Vector3<f64>, len: f64) {
         self.bullets.push([

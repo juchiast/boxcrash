@@ -258,7 +258,7 @@ impl Game {
         self.world.validate();
         self.camera.eye += self.world.player.position - old;
         for ref x in &self.world.bots {
-            if self.world.player.crash(x) {
+            if self.world.player.crash(&x.car) {
                 self.state.ended = true;
             }
         }

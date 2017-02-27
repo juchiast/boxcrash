@@ -1,10 +1,7 @@
 use Color;
-use color::*;
 use cgmath::{Vector3, Vector2};
 use camera::Camera;
 use game::Turn;
-use rnd;
-use rand;
 
 pub struct Car {
     pub size: Vector3<f64>,
@@ -29,25 +26,6 @@ pub struct CarRules {
 }
 
 impl Car {
-    pub fn new_random(rules: &CarRules) -> Car {
-        Car {
-            size: Vector3::new(rnd(rules.size[0]), rnd(rules.size[1]), rnd(rules.size[2])),
-            position: Vector3::new(rnd(rules.position[0]), rnd(rules.position[1]), rnd(rules.position[2])),
-            speed: rnd(rules.speed),
-            turn_speed: rnd(rules.turn_speed),
-            color: if rules.color.is_empty() {
-                RED
-            } else {
-                rules.color[rand::random::<usize>() % rules.color.len()]
-            },
-            jump_v: 0.,
-            jump_a: 0.,
-            jumping: false,
-            current_t: 0.,
-            jump_turn_decrease: rules.jump_turn_decrease,
-        }
-    }
-
     pub fn render(&self, camera: &Camera) -> Vec<([Vector2<f64>; 2], Color)> {
         let mut front = [self.position; 4];
         front[0].y += self.size.y; front[1].y += self.size.y;

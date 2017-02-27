@@ -37,4 +37,5 @@ mod world;
 mod tunel;
 mod car;
 mod camera;
+mod bot;
 pub mod game;
