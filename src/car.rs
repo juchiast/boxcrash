@@ -105,4 +105,13 @@ impl Car {
             }
         }
     }
+    pub fn hit(&self, bullet: &[Vector3<f64>; 3]) -> bool {
+        let (x, y) = (bullet[0], bullet[0]+bullet[1]);
+        let check = |x: &Vector3<f64>| {
+            f64::abs(x.x-self.position.x) < self.size.x/2. &&
+                x.y>=self.position.y && x.y-self.position.y < self.size.y &&
+                x.z>=self.position.z && x.z-self.position.z < self.size.z
+        };
+        check(&x) || check(&y)
+    }
 }

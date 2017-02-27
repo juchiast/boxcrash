@@ -168,10 +168,25 @@ impl World {
                     i += 1;
                 }
             }
+            i = 0;
+            while i<len {
+                if self.bullets.iter().any(|x| self.bots[i].hit(x)) {
+                    self.bots.remove(i);
+                    len = self.bots.len();
+                } else {
+                    i += 1;
+                }
+            }
         }
         while !self.bots.is_empty() && self.bots.front().unwrap().rear_z() < 0. {
             self.bots.pop_front();
         }
+        self.bullets = self.bullets.clone().into_iter().filter(|x| {
+            let x = x[0];
+            x.x>0. && x.x<self.tunel.size.x &&
+            x.y>0. && x.y<self.tunel.size.y &&
+            x.z>0. && x.z<self.tunel.size.z
+        }).collect();
     }
     pub fn add_bot(&mut self, rules: &CarRules) {
         self.bots.push_back(Car::new_random(rules));
