@@ -107,7 +107,7 @@ impl Game {
     fn new_camera(config: &GameConfig, player: &Car) -> Camera {
         Camera::new(config.screen_size.clone(),
         Vector3::new(player.position.x,
-                     config.camera_height,
+                     config.camera_height + player.position.y,
                      player.position.z-config.camera_distance))
     }
 
