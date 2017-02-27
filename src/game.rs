@@ -1,20 +1,19 @@
 use Pixel;
 use world::World;
 use piston_window::*;
-use car::CarRules;
 use camera::Camera;
 use cgmath::{Vector3, Vector2};
 use cgmath::prelude::*;
 use color::*;
 use rnd;
-use car::Car;
+use car::*;
 use piston_window::Ellipse;
 
 pub struct Game {
     config: GameConfig,
     world: World,
     window: PistonWindow,
-    bot_rules: CarRules,
+    bot_rules: BoxRules,
     camera: Camera,
     state: State,
 }
@@ -74,7 +73,7 @@ impl Game {
         window.set_ups(config.ups);
         window.set_max_fps(config.max_fps);
         window.set_capture_cursor(true);
-        let bot_rules = CarRules {
+        let bot_rules = BoxRules {
             size: config.bot_size,
             position: [(0., config.tunel_size[0]), (0., 0.), (config.tunel_size[2], config.tunel_size[2])],
             speed: config.bot_speed,
@@ -105,11 +104,11 @@ impl Game {
         }
     }
 
-    fn new_camera(config: &GameConfig, player: &Car) -> Camera {
-        Camera::new(config.screen_size.clone(),
-        Vector3::new(player.position.x,
-                     config.camera_height + player.position.y,
-                     player.position.z-config.camera_distance))
+    fn new_camera<T: Car>(config: &GameConfig, player: &T) -> Camera {
+        Camera::new(
+            config.screen_size.clone(),
+            Vector3::new(0., config.camera_height, -config.camera_distance) + player.pos()
+        )
     }
 
     pub fn run(&mut self) {
@@ -140,7 +139,7 @@ impl Game {
             Button::Keyboard(Key::W) => self.state.sprint = true,
             Button::Keyboard(Key::Space) => if self.state.jump_timeout <= 0. {
                 self.state.jump_timeout = self.config.jump_timeout;
-                self.world.player.start_jump();
+                self.world.player.jump();
             },
             Button::Mouse(MouseButton::Right) => {
                 if self.config.zoom_in {
@@ -253,7 +252,11 @@ impl Game {
             self.world.add_bot(&self.bot_rules);
             self.state.spawn += rnd(self.config.spawn_time);
         }
-        self.world.player.turn(&self.state.turn, dt);
+        match self.state.turn {
+            Turn::Left => self.world.player.turn_left(dt),
+            Turn::Right => self.world.player.turn_right(dt),
+            Turn::None => (),
+        }
         self.world.update(dt, self.state.game_speed);
         self.world.validate();
         self.camera.eye += self.world.player.position - old;

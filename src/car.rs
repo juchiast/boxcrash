@@ -1,9 +1,21 @@
 use Color;
 use cgmath::{Vector3, Vector2};
 use camera::Camera;
-use game::Turn;
 
-pub struct Car {
+pub trait Car {
+    fn render(&self, &Camera) -> Vec<([Vector2<f64>; 2], Color)>;
+    fn crash(&self, &Self) -> bool;
+    fn hit(&self, &[Vector3<f64>; 3]) -> bool;
+    fn forward(&mut self, dt: f64, outside_speed: f64);
+    fn turn_left(&mut self, dt: f64);
+    fn turn_right(&mut self, dt: f64);
+    fn update_jump(&mut self, dt: f64);
+    fn jump(&mut self);
+    fn pos(&self) -> Vector3<f64>;
+    fn turn_speed(&self) -> f64;
+}
+
+pub struct BoxCar {
     pub size: Vector3<f64>,
     pub position: Vector3<f64>,
     pub speed: f64,
@@ -16,7 +28,7 @@ pub struct Car {
     pub jump_turn_decrease: f64,
 }
 
-pub struct CarRules {
+pub struct BoxRules {
     pub size: [(f64, f64); 3],
     pub position: [(f64, f64); 3],
     pub speed: (f64, f64),
@@ -25,8 +37,8 @@ pub struct CarRules {
     pub jump_turn_decrease: f64,
 }
 
-impl Car {
-    pub fn render(&self, camera: &Camera) -> Vec<([Vector2<f64>; 2], Color)> {
+impl Car for BoxCar {
+    fn render(&self, camera: &Camera) -> Vec<([Vector2<f64>; 2], Color)> {
         let mut front = [self.position; 4];
         front[0].y += self.size.y; front[1].y += self.size.y;
         front[0].x -= self.size.x/2.; front[3].x -= self.size.x/2.;
@@ -44,36 +56,34 @@ impl Car {
         ret.into_iter().filter(|x| x.is_some()).map(|x| (x.unwrap(), self.color)).collect()
     }
 
-    pub fn turn(&mut self, turn: &Turn, dt: f64) {
-        let speed = if self.jumping {
-            self.turn_speed/self.jump_turn_decrease
-        } else {
-            self.turn_speed
-        };
-        match *turn {
-            Turn::Left => self.position.x -= dt*speed,
-            Turn::Right => self.position.x += dt*speed,
-            Turn::None => (),
-        }
+    fn turn_left(&mut self, dt: f64) {
+        self.position.x -= dt*self.turn_speed();
     }
-    pub fn rear_z(&self) -> f64 {
-        self.position.z + self.size.z
+    fn turn_right(&mut self, dt: f64) {
+        self.position.x += dt*self.turn_speed();
     }
-    pub fn crash(&self, a: &Car) -> bool {
+    fn pos(&self) -> Vector3<f64> {
+        self.position
+    }
+    fn crash(&self, a: &Self) -> bool {
         (f64::abs(self.position.x - a.position.x) < (self.size.x+a.size.x)/2.) &&
             ((self.position.z<a.position.z && a.position.z-self.position.z < self.size.z) ||
              (self.position.z>=a.position.z && self.position.z-a.position.z < a.size.z)) &&
             ((self.position.y<a.position.y && a.position.y-self.position.y < self.size.y) ||
              (self.position.y>=a.position.y && self.position.y-a.position.y < a.size.y))
     }
-    pub fn start_jump(&mut self) {
+    fn jump(&mut self) {
         if self.jumping || self.position.y > 0. {}
         else {
             self.jumping = true;
             self.current_t = 0.;
         }
     }
-    pub fn update_jump(&mut self, dt: f64) {
+    fn forward(&mut self, dt: f64, outside_speed: f64) {
+        self.position.z -= dt*(self.speed + outside_speed);
+        self.update_jump(dt);
+    }
+    fn update_jump(&mut self, dt: f64) {
         if self.jumping {
             self.current_t += dt;
             self.position.y = self.current_t*(self.jump_v - 0.5*self.jump_a*self.current_t);
@@ -81,9 +91,9 @@ impl Car {
                 self.position.y = 0.;
                 self.jumping = false;
             }
-        }
+        }   
     }
-    pub fn hit(&self, bullet: &[Vector3<f64>; 3]) -> bool {
+    fn hit(&self, bullet: &[Vector3<f64>; 3]) -> bool {
         let (x, y) = (bullet[0], bullet[0]+bullet[1]);
         let check = |x: &Vector3<f64>| {
             f64::abs(x.x-self.position.x) < self.size.x/2. &&
@@ -91,5 +101,12 @@ impl Car {
                 x.z>=self.position.z && x.z-self.position.z < self.size.z
         };
         check(&x) || check(&y)
+    }
+    fn turn_speed(&self) -> f64 {
+        if self.jumping {
+            self.turn_speed / self.jump_turn_decrease
+        } else {
+            self.turn_speed
+        }
     }
 }

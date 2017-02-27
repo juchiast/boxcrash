@@ -1,5 +1,5 @@
 use tunel::Tunel;
-use car::{CarRules, Car};
+use car::*;
 use Color;
 use color::*;
 use cgmath::{Vector2, Vector3};
@@ -11,7 +11,7 @@ use bot::Bot;
 
 pub struct World {
     pub tunel: Tunel,
-    pub player: Car,
+    pub player: BoxCar,
     pub bots: VecDeque<Bot>,
     pub divider: Vector2<f64>,
     pub decor_distance: f64,
@@ -73,7 +73,7 @@ impl World {
     }
 
     pub fn new(config: &GameConfig) -> World {
-        let player = Car {
+        let player = BoxCar {
             size: Vector3::from(config.player_size),
             position: Vector3::new(config.tunel_size[0]/2., 0., 10.),
             speed: config.player_speed.0,
@@ -105,7 +105,7 @@ impl World {
         ret.append(&mut self.decor_render(camera));
         ret.append(&mut self.player.render(camera));
         for bot in &self.bots {
-            ret.append(&mut bot.car.render(camera));
+            ret.append(&mut bot.render(camera));
         }
         for x in &self.bullets {
             if let Some(rendered) = camera.render_line(&x[0], &(x[0]+x[1])) {
@@ -126,11 +126,11 @@ impl World {
             self.decor_state += self.decor_distance;
         }
         for i in 0..self.bots.len() {
-            self.bots[i].car.position.z -= dt*(self.bots[i].car.speed + speed);
+            self.bots[i].forward(dt, speed);
             if i>0 {
                 let mut j = i-1;
                 while j>0 {
-                    if self.bots[j].car.position.z > self.bots[i].car.position.z {
+                    if self.bots[j].pos().z > self.bots[i].pos().z {
                         self.bots.swap(i, j);
                         j -= 1;
                     } else { break }
@@ -143,7 +143,7 @@ impl World {
     }
     pub fn validate(&mut self) {
         let size = self.tunel.size;
-        let car = |car: &mut Car| {
+        let car = |car: &mut BoxCar| {
             if car.position.x + car.size.x/2. > size.x {
                 car.position.x = size.x - car.size.x/2.;
             } else if car.position.x - car.size.x/2. < 0. {
@@ -161,7 +161,7 @@ impl World {
             let mut len = self.bots.len();
             let mut i = 0;
             while i+1 < len {
-                if self.bots[i].car.crash(&self.bots[i+1].car) {
+                if self.bots[i].crash(&self.bots[i+1]) {
                     self.bots.remove(i+1);
                     self.bots.remove(i);
                     len = self.bots.len();
@@ -171,7 +171,7 @@ impl World {
             }
             i = 0;
             while i<len {
-                if self.bullets.iter().any(|x| self.bots[i].car.hit(x)) {
+                if self.bullets.iter().any(|x| self.bots[i].hit(x)) {
                     self.bots.remove(i);
                     len = self.bots.len();
                 } else {
@@ -179,7 +179,7 @@ impl World {
                 }
             }
         }
-        while !self.bots.is_empty() && self.bots.front().unwrap().car.rear_z() < 0. {
+        while !self.bots.is_empty() && self.bots.front().unwrap().pos().z < 0. {
             self.bots.pop_front();
         }
         self.bullets = self.bullets.clone().into_iter().filter(|x| {
@@ -189,7 +189,7 @@ impl World {
             x.z>0. && x.z<self.tunel.size.z
         }).collect();
     }
-    pub fn add_bot(&mut self, rules: &CarRules) {
+    pub fn add_bot(&mut self, rules: &BoxRules) {
         self.bots.push_back(Bot::new_random(rules));
     }
     pub fn add_bullet(&mut self, origin: Vector3<f64>, direction: Vector3<f64>, len: f64) {
