@@ -63,6 +63,7 @@ pub struct GameConfig {
     pub recharge_time: f64,
     pub bullet_len: f64,
     pub bullet_speed: f64,
+    pub zoom_in: bool,
 }
 
 impl Game {
@@ -142,7 +143,9 @@ impl Game {
                 self.world.player.start_jump();
             },
             Button::Mouse(MouseButton::Right) => {
-                self.camera.zoom_in();
+                if self.config.zoom_in {
+                    self.camera.zoom_in();
+                }
                 self.state.rotate_cam = true;
             },
             Button::Mouse(MouseButton::Left) => if self.state.rotate_cam && self.state.bullets > 0 {
@@ -191,6 +194,12 @@ impl Game {
             self.config.screen_size.w as f64/2.*self.state.recharge/self.config.recharge_time,
             self.config.screen_size.h as f64,
         ];
+        let bullets_bar = [
+            0.,
+            self.config.screen_size.h as f64 - 20.,
+            self.config.screen_size.w as f64/2.*self.state.bullets as f64/self.config.bullet_stock as f64,
+            self.config.screen_size.h as f64,
+        ];
         self.window.draw_2d(e, |c, g| {
             clear(BLACK, g);
             for (l, color) in lines {
@@ -198,6 +207,7 @@ impl Game {
             }
             rectangle(pale(BLUE, 0.4), jump_bar, c.transform, g);
             rectangle(pale(RED, 0.4), recharge_bar, c.transform, g);
+            rectangle(pale(GREEN, 0.4), bullets_bar, c.transform, g);
         });
 
         if self.state.rotate_cam {

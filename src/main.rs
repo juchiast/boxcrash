@@ -29,12 +29,13 @@ fn main() {
         player_jump_a: 5.,
         jump_turn_decrease: 3.,
         jump_timeout: 8.,
-        mouse_speed: PI/300.,
-        trueshot_distance: 50.,
-        bullet_stock: 4,
-        recharge_time: 5.,
-        bullet_len: 2.,
-        bullet_speed: 80.,
+        mouse_speed: PI/360.,
+        trueshot_distance: 100.,
+        bullet_stock: 15,
+        recharge_time: 10.,
+        bullet_len: 5.,
+        bullet_speed: 100.,
+        zoom_in: false,
     };
     Game::new(config).run();
 }
