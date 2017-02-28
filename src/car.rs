@@ -45,7 +45,7 @@ impl Car for BoxCar {
             ret.push(camera.render_line(&rear[i], &rear[(i+1)%4]));
             ret.push(camera.render_line(&front[i], &rear[i]));
         }
-        ret.into_iter().filter(|x| x.is_some()).map(|x| (x.unwrap(), self.color)).collect()
+        ret.into_iter().filter_map(|x| x.map(|x| (x, self.color))).collect()
     }
 
     fn turn_left(&mut self, dt: f64) {
@@ -83,7 +83,7 @@ impl Car for BoxCar {
                 self.position.y = 0.;
                 self.jumping = false;
             }
-        }   
+        }
     }
     fn hit(&self, bullet: &[Vector3<f64>; 3]) -> bool {
         let (x, y) = (bullet[0], bullet[0]+bullet[1]);

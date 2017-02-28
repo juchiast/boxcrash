@@ -38,16 +38,15 @@ mod color {
     }
 }
 
-use game::{Game, GameConfig};
-use std::f64::consts::PI;
-use std::io::prelude::*;
-use std::fs::File;
-
 fn rnd((a, b): (f64, f64)) -> f64 {
     let (a, b) = (f64::min(a, b), f64::max(a, b));
     rand::random::<f64>()*(b-a) + a
 }
 
+use game::{Game, GameConfig};
+use std::f64::consts::PI;
+use std::io::prelude::*;
+use std::fs::File;
 
 fn main() {
     let default_config = GameConfig { title: "Box Crash".to_owned(),

@@ -10,7 +10,7 @@ pub struct Tunel {
 impl Tunel {
     pub fn new(size: [f64; 3]) -> Tunel {
         Tunel {
-            size: Vector3::from(size),
+            size: size.into(),
             color: BLUE,
         }
     }
@@ -21,7 +21,7 @@ impl Tunel {
             ((self.size.x, 0., 0.), (self.size.x, 0., self.size.z)),
             ((0., self.size.y, 0.), (0., self.size.y, self.size.z)),
             ((self.size.x, self.size.y, 0.), (self.size.x, self.size.y, self.size.z)),
-        ].into_iter().map(|(a, b)| camera.render_line(&Vector3::from(a), &Vector3::from(b)))
+        ].into_iter().map(|(a, b)| camera.render_line(&a.into(), &b.into()))
          .filter_map(|x| x.map(|x| (x, self.color))).collect()
     }
 }

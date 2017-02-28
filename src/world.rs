@@ -1,7 +1,7 @@
 use tunel::Tunel;
 use car::*;
 use color::*;
-use cgmath::{Vector2, Vector3};
+use cgmath::{Vector2, Vector3, vec3};
 use cgmath::prelude::*;
 use game::GameConfig;
 use camera::Camera;
@@ -22,7 +22,7 @@ pub struct World {
 impl World {
     fn divider_render(&self, camera: &Camera) -> Vec<([Vector2<f64>; 2], Color)> {
         let color = self.tunel.color;
-        let mut points = [Vector3::new(self.tunel.size.x/2., 0., self.divider_state); 4];
+        let mut points = [vec3(self.tunel.size.x/2., 0., self.divider_state); 4];
         points[2].z -= self.divider.y; points[3].z -= self.divider.y;
         points[0].x -= self.divider.x/2.; points[3].x -= self.divider.x/2.;
         points[1].x += self.divider.x/2.; points[2].x += self.divider.x/2.;
@@ -52,10 +52,10 @@ impl World {
     }
     fn decor_render(&self, camera: &Camera) -> Vec<([Vector2<f64>; 2], Color)> {
         let mut data = [
-            Vector3::new(0., 0., self.decor_state),
-            Vector3::new(0., self.tunel.size.y, self.decor_state),
-            Vector3::new(self.tunel.size.x, self.tunel.size.y, self.decor_state),
-            Vector3::new(self.tunel.size.x, 0., self.decor_state),
+            vec3(0., 0., self.decor_state),
+            vec3(0., self.tunel.size.y, self.decor_state),
+            vec3(self.tunel.size.x, self.tunel.size.y, self.decor_state),
+            vec3(self.tunel.size.x, 0., self.decor_state),
         ];
         let mut ret = Vec::new();
         while data[0].z <= self.tunel.size.z {
@@ -73,8 +73,8 @@ impl World {
 
     pub fn new(config: &GameConfig) -> World {
         let player = BoxCar {
-            size: Vector3::from(config.player_size),
-            position: Vector3::new(config.tunel_size[0]/2., 0., 10.),
+            size: config.player_size.into(),
+            position: vec3(config.tunel_size[0]/2., 0., 10.),
             speed: config.player_speed.0,
             turn_speed: config.player_turn_speed,
             color: YELLOW,
@@ -89,7 +89,7 @@ impl World {
             tunel: Tunel::new(config.tunel_size),
             player: player,
             bots: VecDeque::new(),
-            divider: Vector2::from(config.divider_size),
+            divider: config.divider_size.into(),
             divider_state: config.divider_size[1],
             decor_distance: config.decor_distance,
             decor_state: config.decor_distance,
@@ -166,25 +166,15 @@ impl World {
                 if self.bots[i].crash(&self.bots[i+1]) {
                     self.bots.remove(i+1);
                     self.bots.remove(i);
-                    len = self.bots.len();
-                } else {
-                    i += 1;
-                }
-            }
-            i = 0;
-            while i<len {
-                if self.bullets.iter().any(|x| self.bots[i].hit(x)) {
-                    self.bots.remove(i);
-                    len = self.bots.len();
+                    len -= 2;
                 } else {
                     i += 1;
                 }
             }
         }
-        while !self.bots.is_empty() && self.bots.front().unwrap().pos().z < 0. {
-            self.bots.pop_front();
-        }
-        self.bullets = self.bullets.clone().into_iter().filter(|x| {
+        let bullets = self.bullets.clone();
+        self.bots.retain(|x| x.pos().z > 0. && !bullets.iter().any(|b| x.hit(b)));
+        self.bullets = bullets.into_iter().filter(|x| {
             let x = x[0];
             x.x>0. && x.x<self.tunel.size.x &&
             x.y>0. && x.y<self.tunel.size.y &&

@@ -1,5 +1,5 @@
 use std::f64;
-use cgmath::{Vector2, Vector3};
+use cgmath::{Vector2, Vector3, vec3};
 use cgmath::prelude::*;
 use Pixel;
 
@@ -17,12 +17,12 @@ pub struct Camera {
 
 impl Camera {
     pub fn new(size: Pixel, location: Vector3<f64>) -> Camera {
-        let c = Vector3::new(0., 0., 0.5);
+        let c = vec3(0., 0., 0.5);
         Camera {
             eye: location,
             c: c,
-            axis_x: Vector3::new(1.0, 0.0, 0.0),
-            axis_y: Vector3::new(0.0, 1.0, 0.0),
+            axis_x: vec3(1.0, 0.0, 0.0),
+            axis_y: vec3(0.0, 1.0, 0.0),
             zoom_factor: size.w as f64 / MAX_CAM_WIDTH,
             screen_size: size,
         }
@@ -51,7 +51,7 @@ impl Camera {
             let t = self.c.dot(centre-a) / self.c.dot(v);
             let x = t*v + a - centre;
             Some([
-                 if x1.is_some(){x1.unwrap()} else {y1.unwrap()},
+                 x1.unwrap_or_else(|| y1.unwrap()),
                  self.transform(&x)
             ])
         }

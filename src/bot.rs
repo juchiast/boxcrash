@@ -1,5 +1,5 @@
 use car::*;
-use cgmath::{Vector2, Vector3};
+use cgmath::{Vector2, Vector3, vec3};
 use color::*;
 use camera::Camera;
 use rnd;
@@ -42,8 +42,8 @@ impl Bot {
     pub fn new_random(rules: &BoxRules) -> Bot {
         Bot{
             car: BoxCar {
-                size: Vector3::new(rnd(rules.size[0]), rnd(rules.size[1]), rnd(rules.size[2])),
-                position: Vector3::new(rnd(rules.position[0]), rnd(rules.position[1]), rnd(rules.position[2])),
+                size: vec3(rnd(rules.size[0]), rnd(rules.size[1]), rnd(rules.size[2])),
+                position: vec3(rnd(rules.position[0]), rnd(rules.position[1]), rnd(rules.position[2])),
                 speed: rnd(rules.speed),
                 turn_speed: rnd(rules.turn_speed),
                 color: if rules.color.is_empty() {

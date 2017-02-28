@@ -2,7 +2,7 @@ use Pixel;
 use world::World;
 use piston_window::*;
 use camera::Camera;
-use cgmath::{Vector3, Vector2};
+use cgmath::{Vector2, vec3};
 use cgmath::prelude::*;
 use color::*;
 use rnd;
@@ -82,7 +82,8 @@ impl Game {
         window.set_ups(config.ups);
         window.set_max_fps(config.max_fps);
         window.set_capture_cursor(true);
-        let glyphs = Glyphs::new("resources/Ubuntu-R.ttf", window.factory.clone()).unwrap();
+        let glyphs = Glyphs::new("resources/Ubuntu-R.ttf", window.factory.clone())
+            .expect("Unable to load font.");
         let bot_rules = BoxRules {
             size: config.bot_size,
             position: [(0., config.tunel_size[0]), (0., 0.), (config.tunel_size[2], config.tunel_size[2])],
@@ -130,7 +131,7 @@ impl Game {
     fn new_camera<T: Car>(config: &GameConfig, player: &T) -> Camera {
         Camera::new(
             config.screen_size.clone(),
-            Vector3::new(0., config.camera_height, -config.camera_distance) + player.pos()
+            vec3(0., config.camera_height, -config.camera_distance) + player.pos()
         )
     }
 
@@ -178,7 +179,7 @@ impl Game {
             Button::Mouse(MouseButton::Left) => if self.state.rotate_cam && self.state.bullets > 0 {
                 let mut pos = self.world.player.position;
                 pos.y += self.world.player.size.y;
-                let mut d = Vector3::new(0., 0., self.config.trueshot_distance + self.config.camera_distance);
+                let mut d = vec3(0., 0., self.config.trueshot_distance + self.config.camera_distance);
                 d = self.camera.c * d.magnitude2() / d.dot(self.camera.c);
                 d = self.camera.eye + d - pos;
                 d = d * self.config.bullet_speed / d.magnitude();
