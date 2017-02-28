@@ -1,6 +1,5 @@
 use tunel::Tunel;
 use car::*;
-use Color;
 use color::*;
 use cgmath::{Vector2, Vector3};
 use cgmath::prelude::*;

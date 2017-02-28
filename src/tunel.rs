@@ -1,5 +1,4 @@
 use cgmath::{Vector2, Vector3};
-use Color;
 use color::*;
 use camera::Camera;
 
@@ -23,6 +22,6 @@ impl Tunel {
             ((0., self.size.y, 0.), (0., self.size.y, self.size.z)),
             ((self.size.x, self.size.y, 0.), (self.size.x, self.size.y, self.size.z)),
         ].into_iter().map(|(a, b)| camera.render_line(&Vector3::from(a), &Vector3::from(b)))
-         .filter(|x| x.is_some()).map(|x| (x.unwrap(), self.color)).collect()
+         .filter_map(|x| x.map(|x| (x, self.color))).collect()
     }
 }

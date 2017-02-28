@@ -1,7 +1,6 @@
 use car::*;
 use cgmath::{Vector2, Vector3};
 use color::*;
-use Color;
 use camera::Camera;
 use rnd;
 use rand;

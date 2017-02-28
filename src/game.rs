@@ -9,6 +9,9 @@ use rnd;
 use car::*;
 use piston_window::Ellipse;
 use bot::BoxRules;
+use std::cell::RefCell;
+use std::ops::DerefMut;
+use std::time::Instant;
 
 pub struct Game {
     config: GameConfig,
@@ -17,6 +20,8 @@ pub struct Game {
     bot_rules: BoxRules,
     camera: Camera,
     state: State,
+    glyphs: RefCell<Glyphs>,
+    ellipse: RefCell<Ellipse>,
 }
 
 struct State {
@@ -29,12 +34,15 @@ struct State {
     pub rotate_cam: bool,
     pub bullets: i64,
     pub recharge: f64,
+    pub fps: f64,
+    pub last_frame: Instant,
 }
 
 pub enum Turn { Left, Right, None, }
 
+#[derive(Serialize, Deserialize)]
 pub struct GameConfig {
-    pub title: &'static str,
+    pub title: String,
     pub screen_size: Pixel,
     pub ups: u64,
     pub max_fps: u64,
@@ -69,11 +77,12 @@ pub struct GameConfig {
 impl Game {
     pub fn new(config: GameConfig) -> Game {
         let mut window: PistonWindow = WindowSettings::new(
-            config.title, [config.screen_size.w, config.screen_size.h])
+            config.title.clone(), [config.screen_size.w, config.screen_size.h])
             .exit_on_esc(true).build().unwrap();
         window.set_ups(config.ups);
         window.set_max_fps(config.max_fps);
         window.set_capture_cursor(true);
+        let glyphs = Glyphs::new("resources/Ubuntu-R.ttf", window.factory.clone()).unwrap();
         let bot_rules = BoxRules {
             size: config.bot_size,
             position: [(0., config.tunel_size[0]), (0., 0.), (config.tunel_size[2], config.tunel_size[2])],
@@ -94,7 +103,18 @@ impl Game {
             rotate_cam: false,
             bullets: config.bullet_stock,
             recharge: 0.,
+            fps: 0.,
+            last_frame: Instant::now(),
         };
+        let ellipse = Ellipse {
+            color: pale(BLACK, 0.),
+            border: Some(ellipse::Border {
+                color: pale(RED, 0.5),
+                radius: 1.,
+            }),
+            resolution: 360,
+        };
+
         Game {
             config: config,
             world: world,
@@ -102,6 +122,8 @@ impl Game {
             bot_rules: bot_rules,
             camera: camera,
             state: state,
+            glyphs: RefCell::new(glyphs),
+            ellipse: RefCell::new(ellipse),
         }
     }
 
@@ -117,7 +139,12 @@ impl Game {
             match e {
                 Input::Press(key) => self.press(key),
                 Input::Release(key) => self.release(key),
-                Input::Render(_) => self.draw(&e),
+                Input::Render(_) => {
+                    let d = self.state.last_frame.elapsed();
+                    self.state.last_frame = Instant::now();
+                    self.state.fps = 1. / (d.as_secs() as f64 + 1e-9*d.subsec_nanos() as f64);
+                    self.draw(&e);
+                },
                 Input::Update(args) => self.update(args.dt),
                 Input::Move(Motion::MouseRelative(a, b)) => self.mouse_move(a as f64, b as f64),
                 _ => {}
@@ -181,25 +208,20 @@ impl Game {
         }
     }
     fn draw(&mut self, e: &Input) {
+        macro_rules! bar {
+            ($curr: expr, $full: expr) => {
+                [0.,
+                self.config.screen_size.h as f64 - 20.,
+                self.config.screen_size.w as f64/2.*$curr/$full,
+                self.config.screen_size.h as f64,]
+            };
+        }
+        let jump_bar = bar!(self.state.jump_timeout, self.config.jump_timeout);
+        let recharge_bar = bar!(self.state.recharge, self.config.recharge_time);
+        let bullets_bar = bar!(self.state.bullets as f64, self.config.bullet_stock as f64);
+        let mut glyphs = self.glyphs.borrow_mut();
+        let fps = format!("{:.3}", self.state.fps);
         let lines = self.world.render(&self.camera);
-        let jump_bar = [
-            0.,
-            self.config.screen_size.h as f64 - 20.,
-            self.config.screen_size.w as f64/2.*self.state.jump_timeout/self.config.jump_timeout,
-            self.config.screen_size.h as f64,
-        ];
-        let recharge_bar = [
-            0.,
-            self.config.screen_size.h as f64 - 20.,
-            self.config.screen_size.w as f64/2.*self.state.recharge/self.config.recharge_time,
-            self.config.screen_size.h as f64,
-        ];
-        let bullets_bar = [
-            0.,
-            self.config.screen_size.h as f64 - 20.,
-            self.config.screen_size.w as f64/2.*self.state.bullets as f64/self.config.bullet_stock as f64,
-            self.config.screen_size.h as f64,
-        ];
         self.window.draw_2d(e, |c, g| {
             clear(BLACK, g);
             for (l, color) in lines {
@@ -208,22 +230,16 @@ impl Game {
             rectangle(pale(BLUE, 0.4), jump_bar, c.transform, g);
             rectangle(pale(RED, 0.4), recharge_bar, c.transform, g);
             rectangle(pale(GREEN, 0.4), bullets_bar, c.transform, g);
+            text(WHITE, 10, &fps, glyphs.deref_mut(), c.transform.trans(0., 10.), g);
         });
 
         if self.state.rotate_cam {
             let w = 20.;
             let x = self.config.screen_size.w as f64 /2. - w/2.;
             let y = self.config.screen_size.h as f64 /2. - w/2.;
+            let ellipse = self.ellipse.borrow();
             self.window.draw_2d(e, |c, g| {
-                let e = Ellipse {
-                    color: pale(BLACK, 0.),
-                    border: Some(ellipse::Border {
-                        color: pale(RED, 0.5),
-                        radius: 1.,
-                    }),
-                    resolution: 360,
-                };
-                e.draw([x, y, w, w], &c.draw_state, c.transform, g);
+                ellipse.draw([x, y, w, w], &c.draw_state, c.transform, g);
                 rectangle(RED, [x+w/2.-1., y+w/2.-1., 2., 2.], c.transform, g);
             });
         }
