@@ -61,22 +61,21 @@ impl Bot {
         }
     }
     pub fn drive(&mut self, dt: f64) {
-        if self.actions.is_empty() {
-            return;
-        }
-        match self.actions.pop().unwrap() {
-            Action::Jump => self.car.jump(),
-            Action::TurnRight(t) => if t > 0. {
-                self.car.turn_right(dt);
-                self.actions.push(Action::TurnRight(t - dt));
-            },
-            Action::TurnLeft(t) => if t > 0. {
-                self.car.turn_left(dt);
-                self.actions.push(Action::TurnLeft(t - dt));
-            },
-            Action::Rest(t) => if t > 0. {
-                self.actions.push(Action::Rest(t - dt));
-            },
+        if let Some(a) = self.actions.pop() {
+            match a {
+                Action::Jump => self.car.jump(),
+                Action::TurnRight(t) => if t > 0. {
+                    self.car.turn_right(dt);
+                    self.actions.push(Action::TurnRight(t - dt));
+                },
+                Action::TurnLeft(t) => if t > 0. {
+                    self.car.turn_left(dt);
+                    self.actions.push(Action::TurnLeft(t - dt));
+                },
+                Action::Rest(t) => if t > 0. {
+                    self.actions.push(Action::Rest(t - dt));
+                },
+            }
         }
     }
 }
