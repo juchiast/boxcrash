@@ -38,8 +38,8 @@ impl World {
                 for i in 0..4 {
                     r(&points[i], &points[(i+1)%4]);
                 }
-                for i in 0..4 {
-                    points[i].z += 2.*self.divider.y;
+                for p in &mut points {
+                    p.z += 2.*self.divider.y;
                 }
             }
             points[0].z = self.tunel.size.z;
@@ -64,8 +64,8 @@ impl World {
                     ret.push((rendered, self.tunel.color));
                 }
             }
-            for i in 0..4 {
-                data[i].z += self.decor_distance;
+            for x in &mut data {
+                x.z += self.decor_distance;
             }
         }
         ret

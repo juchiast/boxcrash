@@ -35,9 +35,9 @@ impl Car for BoxCar {
         front[0].y += self.size.y; front[1].y += self.size.y;
         front[0].x -= self.size.x/2.; front[3].x -= self.size.x/2.;
         front[1].x += self.size.x/2.; front[2].x += self.size.x/2.;
-        let mut rear = front.clone();
-        for i in 0..4 {
-            rear[i].z += self.size.z;
+        let mut rear = front;
+        for x in &mut rear {
+            x.z += self.size.z;
         }
         let mut ret = Vec::new();
         for i in 0..4 {

@@ -31,7 +31,7 @@ impl Camera {
     pub fn render(&self, x: &Vector3<f64>) -> Option<Vector2<f64>> {
         let centre = self.eye + self.c;
         let side = |x: &Vector3<f64>| self.c.dot(x-centre);
-        if side(&x)*side(&self.eye) > 0. {
+        if side(x)*side(&self.eye) > 0. {
             None
         } else {
             let x = (self.c.magnitude2()/self.c.dot(x-self.eye))*(x-self.eye) - self.c;
@@ -58,7 +58,7 @@ impl Camera {
     }
 
     fn transform(&self, x: &Vector3<f64>) -> Vector2<f64> {
-        if f64::abs(self.c.dot(x.clone())) > 1e-9 {
+        if f64::abs(self.c.dot(*x)) > 1e-9 {
             panic!("Unexpected error in `fn Camera::transform`: {:?} {:?}, {}", self.c, x, self.c.dot(x.clone()));
         }
         let a = x.dot(self.axis_x)/self.axis_x.magnitude();
