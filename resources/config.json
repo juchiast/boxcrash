@@ -1,5 +1,6 @@
 {
     "title":"Box Crash",
+    "full_screen":true,
     "screen_size":{
         "w":1366,
         "h":768

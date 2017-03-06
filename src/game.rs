@@ -43,6 +43,7 @@ pub enum Turn { Left, Right, None, }
 #[derive(Serialize, Deserialize)]
 pub struct GameConfig {
     pub title: String,
+    pub fullscreen: bool,
     pub screen_size: Pixel,
     pub ups: u64,
     pub max_fps: u64,
@@ -75,10 +76,15 @@ pub struct GameConfig {
 }
 
 impl Game {
-    pub fn new(config: GameConfig) -> Game {
+    pub fn new(mut config: GameConfig) -> Game {
         let mut window: PistonWindow = WindowSettings::new(
             config.title.clone(), [config.screen_size.w, config.screen_size.h])
-            .exit_on_esc(true).build().unwrap();
+            .exit_on_esc(true).fullscreen(config.fullscreen).build()
+            .expect("Cannot create window.");
+        if config.fullscreen {
+            config.screen_size.w = window.size().width;
+            config.screen_size.h = window.size().height;
+        }
         window.set_ups(config.ups);
         window.set_max_fps(config.max_fps);
         window.set_capture_cursor(true);

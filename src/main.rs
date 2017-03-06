@@ -49,7 +49,9 @@ use std::io::prelude::*;
 use std::fs::File;
 
 fn main() {
-    let default_config = GameConfig { title: "Box Crash".to_owned(),
+    let default_config = GameConfig {
+        title: "Box Crash".to_owned(),
+        fullscreen: true,
         screen_size: Pixel::new(800, 600),
         ups: 60,
         max_fps: 60,
