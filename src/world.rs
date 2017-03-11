@@ -98,20 +98,14 @@ impl World {
     }
 
     pub fn render(&self, camera: &Camera) -> Vec<([Vector2<f64>; 2], Color)> {
-        let mut ret = Vec::new();
-        ret.append(&mut self.tunel.render(camera));
-        ret.append(&mut self.divider_render(camera));
-        ret.append(&mut self.decor_render(camera));
-        ret.append(&mut self.player.render(camera));
-        for bot in &self.bots {
-            ret.append(&mut bot.render(camera));
-        }
-        for x in &self.bullets {
-            if let Some(rendered) = camera.render_line(&x[0], &(x[0]+x[1])) {
-                ret.push((rendered, self.player.color));
-            }
-        }
-        ret
+        Vec::new().into_iter()
+            .chain(self.tunel.render(camera))
+            .chain(self.divider_render(camera))
+            .chain(self.decor_render(camera))
+            .chain(self.player.render(camera))
+            .chain(self.bots.iter().flat_map(|x| x.render(camera)))
+            .chain(self.bullets.iter().filter_map(|x| camera.render_line(&x[0], &(x[0]+x[1])).map(|x| (x, self.player.color))))
+            .collect()
     }
     pub fn update(&mut self, dt: f64, game_speed: f64) {
         self.player.update_jump(dt);
