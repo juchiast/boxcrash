@@ -12,11 +12,13 @@ mod camera;
 mod bot;
 pub mod game;
 
+// Pixel present a point in the window and window's size
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Pixel {
     pub w: u32,
     pub h: u32,
 }
+
 impl Pixel {
     pub fn new(w: u32, h: u32) -> Pixel { Pixel {w: w, h: h} }
 }
@@ -32,14 +34,17 @@ mod color {
     pub const YELLOW: Color = [1.0, 1.0, 0.0, 1.0];
     pub const WHITE: Color = [1.0, 1.0, 1.0, 1.0];
     pub const PALE: Color = [0.3, 0.3, 0.3, 0.1];
+    // Set alpha chanel `f` for a color
     pub fn pale(mut c: Color, f: f32) -> Color {
         c[3] = f;
         c
     }
 }
 
+// Return a random number between a and b
 fn rnd((a, b): (f64, f64)) -> f64 {
     let (a, b) = (f64::min(a, b), f64::max(a, b));
+    // `random::<f64>()` return a number between 0 and 1
     rand::random::<f64>()*(b-a) + a
 }
 
@@ -81,9 +86,12 @@ fn main() {
         bullet_speed: 100.,
         zoom_in: false,
     };
+
+    // Try to read config file, fallback to the default config otherwise
     let config = File::open("resources/config.json").ok().and_then(|mut f| {
         let mut s = String::new();
         f.read_to_string(&mut s).ok().and_then(|_| serde_json::from_str(&s).ok())
     }).unwrap_or(default_config);
+    // Initialize and run the game, game ends when the player crash
     Game::new(config).run();
 }

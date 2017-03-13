@@ -3,7 +3,10 @@ use color::*;
 use camera::Camera;
 
 pub struct Tunel {
+    // Size of tunel, x, y, z is the width, height, and deep of the
+    // tunel.
     pub size: Vector3<f64>,
+    // Color to draw tunel
     pub color: Color,
 }
 

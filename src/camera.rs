@@ -5,9 +5,12 @@ use Pixel;
 
 const MAX_CAM_WIDTH: f64 = 1.0; 
 
+// A struct to render points and lines in 3D plane to the screen
 #[derive(Clone)]
 pub struct Camera {
+    // Location of the camera
     pub eye: Vector3<f64>,
+    // Direction
     pub c: Vector3<f64>,
     axis_x: Vector3<f64>,
     axis_y: Vector3<f64>,
@@ -28,6 +31,7 @@ impl Camera {
         }
     }
 
+    // Render a single point, return None if we can't see it
     pub fn render(&self, x: &Vector3<f64>) -> Option<Vector2<f64>> {
         let centre = self.eye + self.c;
         let side = |x: &Vector3<f64>| self.c.dot(x-centre);
@@ -68,6 +72,9 @@ impl Camera {
         Vector2::new(w, h)
     }
 
+    // Rotate the camera's direction around a centre and 
+    // the Ox, Oy axis (3D plane axis).
+    // `x`, `y` is degree measured in Radian.
     pub fn rotate(&mut self, y: f64, x: f64, centre: Vector3<f64>) {
         use cgmath::{Basis3, Rotation3, Rad};
         let mut vec = self.eye - centre;

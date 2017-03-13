@@ -13,50 +13,54 @@ use std::cell::RefCell;
 use std::ops::DerefMut;
 use std::time::Instant;
 
+// `Game` contains every things to run the game
 pub struct Game {
     config: GameConfig,
-    world: World,
+    world: World, // All objects in the game
     window: PistonWindow,
-    bot_rules: BoxRules,
-    camera: Camera,
-    state: State,
-    glyphs: RefCell<Glyphs>,
-    ellipse: RefCell<Ellipse>,
+    bot_rules: BoxRules, // Rules to create a new bot
+    camera: Camera, // Camera for rendering
+    state: State, // Current state of game
+    // Wrap these caches in `RefCell` to allow interior mutability
+    glyphs: RefCell<Glyphs>, // Font cache
+    ellipse: RefCell<Ellipse>, // Model to draw a circle
 }
 
 struct State {
-    pub turn: Turn,
-    pub sprint: bool,
-    pub spawn: f64,
-    pub ended: bool,
-    pub game_speed: f64,
-    pub jump_timeout: f64,
-    pub rotate_cam: bool,
-    pub bullets: i64,
-    pub recharge: f64,
-    pub fps: f64,
-    pub last_frame: Instant,
+    pub turn: Turn, // Presents movement of player
+    pub sprint: bool, // Player is speeding-up or not
+    pub spawn: f64, // Count down time to spawn a new bot
+    pub ended: bool, // Game is over or not
+    pub game_speed: f64, // Game speed in addition to player's speed
+    pub jump_timeout: f64, // Count down to allow the next jump
+    pub rotate_cam: bool, // Allow rotation of camera or not
+    pub bullets: i64, // The number of bullets left
+    pub recharge: f64, // Bullets recharge time
+    pub fps: f64, // Real fps of game
+    pub last_frame: Instant, // Moment of the last draw
 }
 
 pub enum Turn { Left, Right, None, }
 
+// Configurable game's contansts.
+// A tuple presents a range of something.
 #[derive(Serialize, Deserialize)]
 pub struct GameConfig {
     pub title: String,
     pub screen_size: Pixel,
-    pub ups: u64,
+    pub ups: u64, // Update per second
     pub max_fps: u64,
     pub tunel_size: [f64; 3],
     pub player_size: [f64; 3],
-    pub player_speed: (f64, f64),
+    pub player_speed: (f64, f64), // min and max player speed
     pub player_turn_speed: f64,
-    pub bot_size: [(f64, f64); 3],
+    pub bot_size: [(f64, f64); 3], // Range of bot's size
     pub bot_speed: (f64, f64),
     pub bot_turn_speed: (f64, f64),
     pub divider_size: [f64; 2],
-    pub camera_height: f64,
-    pub camera_distance: f64,
-    pub decor_distance: f64,
+    pub camera_height: f64, // Height of camera (from player)
+    pub camera_distance: f64, // Distance from camera to player
+    pub decor_distance: f64, // Distance between each decoration
     pub sprint_factor: f64,
     pub spawn_time: (f64, f64),
     pub game_sprint: f64,
@@ -67,11 +71,11 @@ pub struct GameConfig {
     pub jump_timeout: f64,
     pub mouse_speed: f64,
     pub trueshot_distance: f64,
-    pub bullet_stock: i64,
+    pub bullet_stock: i64, // Number of bullets
     pub recharge_time: f64,
     pub bullet_len: f64,
     pub bullet_speed: f64,
-    pub zoom_in: bool,
+    pub zoom_in: bool, // If true, zoom-in while on stare mode
 }
 
 impl Game {

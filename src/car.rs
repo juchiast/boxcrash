@@ -2,6 +2,9 @@ use color::*;
 use cgmath::{Vector3, Vector2};
 use camera::Camera;
 
+// Present a car that can be drawed, check for collision 
+// with other car and bullet, turn left/right, move forward
+// and jump.
 pub trait Car {
     fn render(&self, &Camera) -> Vec<([Vector2<f64>; 2], Color)>;
     fn crash(&self, &Self) -> bool;
@@ -15,6 +18,7 @@ pub trait Car {
     fn turn_speed(&self) -> f64;
 }
 
+// Car with shape of a box
 pub struct BoxCar {
     pub size: Vector3<f64>,
     pub position: Vector3<f64>,
