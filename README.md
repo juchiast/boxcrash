@@ -1,3 +1,5 @@
+# Box Crash
+
 This is a simple game in Rust and Piston with a Camera for 3D rendering.
 This game was written with hope to be a good example of game development in Rust.
 
@@ -22,12 +24,22 @@ Control:
 - Jump: Space
 - Stare and shoot: Hold right mouse, then click left mouse
 
-## Bugs
+## Known bugs
 
 Game run a bit slow on Windows machine.
 
-Crashed on some Ubuntu machine with a "Cannot find root window" error (I still don't know how to fix).
+Crashed on some Ubuntu machines with a "Cannot find root window" error (I still don't know how to fix).
 This seem to be a piston\_window's bug.
+
+## What's next?
+
+- Write an article about the writing of this code.
+- Fix some known bugs.
+- Test game on more machines.
+- Write a GUI to configure and restart game.
+- Draw more details of box and the road.
+- Add some sounds.
+- Try to build on Web and Android.
 
 ## License
 
