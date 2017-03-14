@@ -5,13 +5,16 @@ use camera::Camera;
 use rnd;
 use rand;
 
+// Action with duration
+// e.g. `TurnLeft(3.)` means turn left for 3s
 pub enum Action {
-    Rest(f64),
+    Rest(f64), // Do nothing
     Jump,
     TurnLeft(f64),
     TurnRight(f64),
 }
 
+// Rules to generate new bot
 pub struct BoxRules {
     pub size: [(f64, f64); 3],
     pub position: [(f64, f64); 3],
@@ -80,7 +83,7 @@ impl Bot {
     }
 }
 
-
+// Bot is also a `Car`
 impl Car for Bot {
     fn render(&self, cam: &Camera) -> Vec<([Vector2<f64>; 2], Color)> {
         self.car.render(cam)
