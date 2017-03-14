@@ -7,7 +7,7 @@ use camera::Camera;
 // and jump.
 pub trait Car {
     fn render(&self, &Camera) -> Vec<([Vector2<f64>; 2], Color)>;
-    fn crash(&self, &Self) -> bool;
+    fn crashed(&self, &Self) -> bool;
     fn hit(&self, &[Vector3<f64>; 3]) -> bool;
     fn forward(&mut self, dt: f64, outside_speed: f64);
     fn turn_left(&mut self, dt: f64);
@@ -61,7 +61,7 @@ impl Car for BoxCar {
     fn pos(&self) -> Vector3<f64> {
         self.position
     }
-    fn crash(&self, a: &Self) -> bool {
+    fn crashed(&self, a: &Self) -> bool {
         (f64::abs(self.position.x - a.position.x) < (self.size.x+a.size.x)/2.) &&
             ((self.position.z<a.position.z && a.position.z-self.position.z < self.size.z) ||
              (self.position.z>=a.position.z && self.position.z-a.position.z < a.size.z)) &&

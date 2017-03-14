@@ -88,8 +88,8 @@ impl Car for Bot {
     fn render(&self, cam: &Camera) -> Vec<([Vector2<f64>; 2], Color)> {
         self.car.render(cam)
     }
-    fn crash(&self, x: &Self) -> bool {
-        self.car.crash(&x.car)
+    fn crashed(&self, x: &Self) -> bool {
+        self.car.crashed(&x.car)
     }
     fn hit(&self, x: &[Vector3<f64>; 3]) -> bool {
         self.car.hit(x)

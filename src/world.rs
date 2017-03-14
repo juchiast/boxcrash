@@ -157,7 +157,7 @@ impl World {
             let mut len = self.bots.len();
             let mut i = 0;
             while i+1 < len {
-                if self.bots[i].crash(&self.bots[i+1]) {
+                if self.bots[i].crashed(&self.bots[i+1]) {
                     self.bots.remove(i+1);
                     self.bots.remove(i);
                     len -= 2;

@@ -38,6 +38,7 @@ This seem to be a piston\_window's bug.
 - Test game on more machines.
 - Write a GUI to configure and restart game.
 - Draw more details of box and the road.
+- Add crashing animations.
 - Add some sounds.
 - Try to build on Web and Android.
 

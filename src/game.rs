@@ -63,7 +63,7 @@ pub struct GameConfig {
     pub decor_distance: f64, // Distance between each decoration
     pub sprint_factor: f64,
     pub spawn_time: (f64, f64),
-    pub game_sprint: f64,
+    pub game_sprint: f64, // The increase of game_speed
     pub game_max_speed: f64,
     pub player_jump_v: f64,
     pub player_jump_a: f64,
@@ -146,6 +146,7 @@ impl Game {
                 Input::Press(key) => self.press(key),
                 Input::Release(key) => self.release(key),
                 Input::Render(_) => {
+                    // Calculate fps
                     let d = self.state.last_frame.elapsed();
                     self.state.last_frame = Instant::now();
                     self.state.fps = 1. / (d.as_secs() as f64 + 1e-9*d.subsec_nanos() as f64);
@@ -160,7 +161,6 @@ impl Game {
             }
         }
     }
-
     fn mouse_move(&mut self, x: f64, y: f64) {
         if self.state.rotate_cam {
             self.camera.rotate(x*self.config.mouse_speed, y*self.config.mouse_speed, self.world.player.position);
@@ -214,6 +214,7 @@ impl Game {
         }
     }
     fn draw(&mut self, e: &Input) {
+        // Return a horizontal bar
         macro_rules! bar {
             ($curr: expr, $full: expr) => {
                 [0.,
@@ -225,6 +226,8 @@ impl Game {
         let jump_bar = bar!(self.state.jump_timeout, self.config.jump_timeout);
         let recharge_bar = bar!(self.state.recharge, self.config.recharge_time);
         let bullets_bar = bar!(self.state.bullets as f64, self.config.bullet_stock as f64);
+        // Closure in `draw_2d` requires unique access to `self`,
+        // so we use RefCell to hack it.
         let mut glyphs = self.glyphs.borrow_mut();
         let fps = format!("{:.3}", self.state.fps);
         let lines = self.world.render(&self.camera);
@@ -251,6 +254,7 @@ impl Game {
         }
 
     }
+    // `dt` stands for delta, duration since the last update
     fn update(&mut self, dt: f64) {
         let old = self.world.player.position;
         if self.state.bullets <= 0 {
@@ -280,13 +284,16 @@ impl Game {
             Turn::Right => self.world.player.turn_right(dt),
             Turn::None => (),
         }
+        // Update objects in the world
         self.world.update(dt, self.state.game_speed);
+        // Validate things like object's boundary, bullets and boxes
+        // collisions.
         self.world.validate();
+        // Update camera's location
         self.camera.eye += self.world.player.position - old;
-        for x in &self.world.bots {
-            if self.world.player.crash(&x.car) {
-                self.state.ended = true;
-            }
+        // Check for player's collision with bot
+        if self.world.bots.iter().any(|x| self.world.player.crashed(&x.car)) {
+            self.state.ended = true;
         }
     }
 }
