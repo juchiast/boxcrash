@@ -8,6 +8,8 @@ This game was written with hope to be a good example of game development in Rust
 
 ## Build and run
 
+Download binary (64-bit Windows and Linux) here: https://github.com/juchiast/boxcrash/releases
+
 This code should be compiled with the latest stable version of Rust (1.15.1 as of this writing).
 
 Almost all game's constants are configurable via `resources/config.json`.
