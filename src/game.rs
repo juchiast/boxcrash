@@ -44,7 +44,7 @@ pub enum Turn { Left, Right, None, }
 
 // Configurable game's contansts.
 // A tuple presents a range of something.
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct GameConfig {
     pub title: String,
     pub screen_size: Pixel,

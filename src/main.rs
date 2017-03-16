@@ -4,13 +4,17 @@ extern crate piston_window;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
+#[macro_use]
+extern crate conrod;
 
 mod world;
 mod tunel;
 mod car;
 mod camera;
 mod bot;
-pub mod game;
+mod game;
+mod support;
+mod ui;
 
 // Pixel present a point in the window and window's size
 #[derive(Clone, Serialize, Deserialize)]
@@ -48,7 +52,7 @@ fn rnd((a, b): (f64, f64)) -> f64 {
     rand::random::<f64>()*(b-a) + a
 }
 
-use game::{Game, GameConfig};
+use game::GameConfig;
 use std::f64::consts::PI;
 use std::io::prelude::*;
 use std::fs::File;
@@ -92,6 +96,6 @@ fn main() {
         let mut s = String::new();
         f.read_to_string(&mut s).ok().and_then(|_| serde_json::from_str(&s).ok())
     }).unwrap_or(default_config);
-    // Initialize and run the game, game ends when the player crash
-    Game::new(config).run();
+
+    ui::start_game(config);
 }
