@@ -113,9 +113,9 @@ impl Game {
             last_frame: Instant::now(),
         };
         let ellipse = Ellipse {
-            color: pale(BLACK, 0.),
+            color: BLACK.alpha(0.).into(),
             border: Some(ellipse::Border {
-                color: pale(RED, 0.5),
+                color: RED.alpha(0.5).into(),
                 radius: 1.,
             }),
             resolution: 360,
@@ -232,14 +232,14 @@ impl Game {
         let fps = format!("{:.3}", self.state.fps);
         let lines = self.world.render(&self.camera);
         self.window.draw_2d(e, |c, g| {
-            clear(BLACK, g);
+            clear(BLACK.into(), g);
             for (l, color) in lines {
-                line(color, 1., convert(l), c.transform, g);
+                line(color.into(), 1., convert(l), c.transform, g);
             }
-            rectangle(pale(BLUE, 0.4), jump_bar, c.transform, g);
-            rectangle(pale(RED, 0.4), recharge_bar, c.transform, g);
-            rectangle(pale(GREEN, 0.4), bullets_bar, c.transform, g);
-            text(WHITE, 10, &fps, glyphs.deref_mut(), c.transform.trans(0., 10.), g);
+            rectangle(BLUE.alpha(0.4).into(), jump_bar, c.transform, g);
+            rectangle(RED.alpha(0.4).into(), recharge_bar, c.transform, g);
+            rectangle(GREEN.alpha(0.4).into(), bullets_bar, c.transform, g);
+            text(WHITE.into(), 10, &fps, glyphs.deref_mut(), c.transform.trans(0., 10.), g);
         });
 
         if self.state.rotate_cam {
@@ -249,7 +249,7 @@ impl Game {
             let ellipse = self.ellipse.borrow();
             self.window.draw_2d(e, |c, g| {
                 ellipse.draw([x, y, w, w], &c.draw_state, c.transform, g);
-                rectangle(RED, [x+w/2.-1., y+w/2.-1., 2., 2.], c.transform, g);
+                rectangle(RED.into(), [x+w/2.-1., y+w/2.-1., 2., 2.], c.transform, g);
             });
         }
 
