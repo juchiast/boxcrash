@@ -19,6 +19,7 @@ pub trait Car {
 }
 
 // Car with shape of a box
+#[derive(Clone)]
 pub struct BoxCar {
     pub size: Vector3<f64>,
     pub position: Vector3<f64>,

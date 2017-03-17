@@ -6,6 +6,7 @@ use rnd;
 
 // Action with duration
 // e.g. `TurnLeft(3.)` means turn left for 3s
+#[derive(Clone)]
 pub enum Action {
     Rest(f64), // Do nothing
     Jump,
@@ -23,6 +24,7 @@ pub struct BoxRules {
     pub jump_turn_decrease: f64,
 }
 
+#[derive(Clone)]
 pub struct Bot {
     pub car: BoxCar,
     pub actions: Vec<Action>,
