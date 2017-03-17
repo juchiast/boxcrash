@@ -1,7 +1,5 @@
-use std::f64;
 use cgmath::{Vector2, Vector3, vec3};
 use cgmath::prelude::*;
-use Pixel;
 
 const MAX_CAM_WIDTH: f64 = 1.0; 
 
@@ -15,11 +13,11 @@ pub struct Camera {
     axis_x: Vector3<f64>,
     axis_y: Vector3<f64>,
     zoom_factor: f64,
-    screen_size: Pixel,
+    screen_size: ::Pixel,
 }
 
 impl Camera {
-    pub fn new(size: Pixel, location: Vector3<f64>) -> Camera {
+    pub fn new(size: ::Pixel, location: Vector3<f64>) -> Camera {
         let c = vec3(0., 0., 0.5);
         Camera {
             eye: location,

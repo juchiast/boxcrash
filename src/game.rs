@@ -1,11 +1,9 @@
-use Pixel;
 use world::World;
 use piston_window::*;
 use camera::Camera;
 use cgmath::{Vector2, vec3};
 use cgmath::prelude::*;
 use color::*;
-use rnd;
 use car::*;
 use piston_window::Ellipse;
 use bot::BoxRules;
@@ -47,7 +45,7 @@ pub enum Turn { Left, Right, None, }
 #[derive(Serialize, Deserialize, Clone)]
 pub struct GameConfig {
     pub title: String,
-    pub screen_size: Pixel,
+    pub screen_size: ::Pixel,
     pub ups: u64, // Update per second
     pub max_fps: u64,
     pub tunel_size: [f64; 3],
@@ -277,7 +275,7 @@ impl Game {
         self.state.spawn -= dt;
         if self.state.spawn < 0. {
             self.world.add_bot(&self.bot_rules);
-            self.state.spawn += rnd(self.config.spawn_time);
+            self.state.spawn += ::rnd(self.config.spawn_time);
         }
         match self.state.turn {
             Turn::Left => self.world.player.turn_left(dt),

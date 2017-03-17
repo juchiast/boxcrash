@@ -1,4 +1,3 @@
-use conrod;
 use conrod::{Positionable, Sizeable, Labelable, Widget, Colorable};
 use conrod::widget;
 use conrod::backend::glium::{glium, Renderer};
@@ -62,10 +61,10 @@ fn start_game(config: &mut GameConfig, first_time: bool) -> Option<::std::thread
         .with_title(config.title.as_ref())
         .build_glium()
         .expect("UI: Cannot build window");
-    let mut ui = conrod::UiBuilder::new([320., 240.]).build();
+    let mut ui = ::conrod::UiBuilder::new([320., 240.]).build();
     ui.fonts.insert_from_file("resources/Ubuntu-R.ttf").expect("UI: cannot load font");
     let mut renderer = Renderer::new(&display).expect("UI: cannot load renderer");
-    let image_map = conrod::image::Map::<glium::texture::Texture2d>::new();
+    let image_map = ::conrod::image::Map::<glium::texture::Texture2d>::new();
     let mut event_loop = EventLoop::new();
 
     widget_ids!(struct Ids {

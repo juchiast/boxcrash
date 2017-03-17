@@ -3,7 +3,6 @@ use cgmath::{Vector2, Vector3, vec3};
 use color::*;
 use camera::Camera;
 use rnd;
-use rand;
 
 // Action with duration
 // e.g. `TurnLeft(3.)` means turn left for 3s
@@ -31,7 +30,7 @@ pub struct Bot {
 
 impl Action {
     fn rand() -> Action {
-        match rand::random::<usize>() % 4 {
+        match ::rand::random::<usize>() % 4 {
             0 => Action::Rest(rnd((0.25, 1.))),
             1 => Action::TurnLeft(rnd((0.25, 1.))),
             2 => Action::TurnRight(rnd((0.25, 1.))),
@@ -52,7 +51,7 @@ impl Bot {
                 color: if rules.color.is_empty() {
                     RED
                 } else {
-                    rules.color[rand::random::<usize>() % rules.color.len()]
+                    rules.color[::rand::random::<usize>() % rules.color.len()]
                 },
                 jump_v: 5.,
                 jump_a: 7.,
@@ -60,7 +59,7 @@ impl Bot {
                 current_t: 0.,
                 jump_turn_decrease: rules.jump_turn_decrease,
             },
-            actions: (0..rand::random::<usize>()%6).map(|_| Action::rand()).collect(),
+            actions: (0..::rand::random::<usize>()%6).map(|_| Action::rand()).collect(),
         }
     }
     pub fn drive(&mut self, dt: f64) {
