@@ -5,7 +5,7 @@ use conrod::backend::glium::{glium, Renderer};
 use conrod::backend::winit;
 use conrod::backend::glium::glium::{DisplayBuild, Surface};
 use ::game::{GameConfig, Game};
-use std::thread;
+use color::*;
 
 // struct `EventLoop` copied from Conrod example
 struct EventLoop {
@@ -56,7 +56,7 @@ impl EventLoop {
     }
 }
 
-fn start_game(config: &mut GameConfig, first_time: bool) -> Option<thread::JoinHandle<()>> {
+fn start_game(config: &mut GameConfig, first_time: bool) -> Option<::std::thread::JoinHandle<()>> {
     let display = glium::glutin::WindowBuilder::new()
         .with_dimensions(320, 240)
         .with_title(config.title.as_ref())
@@ -88,7 +88,7 @@ fn start_game(config: &mut GameConfig, first_time: bool) -> Option<thread::JoinH
             {
                 let ui = &mut ui.set_widgets();
                 let _canvas = widget::Canvas::new()
-                    .rgb(0.5, 0.5, 0.5)
+                    .color(GRAY.into())
                     .set(ids.canvas, ui);
                 let w_text_box = widget::TextBox::new(&screen_w)
                     .mid_top_of(ids.canvas)
@@ -102,11 +102,11 @@ fn start_game(config: &mut GameConfig, first_time: bool) -> Option<thread::JoinH
                     .set(ids.h_text_box, ui);
                 let _w_label = widget::Text::new("Width: ")
                     .left_from(ids.w_text_box, 0.).align_middle_y_of(ids.w_text_box)
-                    .font_size(14).rgb(1., 1., 1.)
+                    .font_size(14).color(WHITE.into())
                     .set(ids.w_label, ui);
                 let _h_label = widget::Text::new("Height: ")
                     .left_from(ids.h_text_box, 0.).align_middle_y_of(ids.h_text_box)
-                    .font_size(14).rgb(1., 1., 1.)
+                    .font_size(14).color(WHITE.into())
                     .set(ids.h_label, ui);
                 let button = widget::Button::new()
                     .down_from(ids.h_text_box, 2.)
@@ -133,7 +133,7 @@ fn start_game(config: &mut GameConfig, first_time: bool) -> Option<thread::JoinH
                     config.screen_size.w = screen_w.parse().unwrap_or(config.screen_size.w);
                     config.screen_size.h = screen_h.parse().unwrap_or(config.screen_size.h);
                     let config = config.clone();
-                    return Some(thread::spawn(|| Game::new(config).run()));
+                    return Some(::std::thread::spawn(|| Game::new(config).run()));
                 }
             }
 
