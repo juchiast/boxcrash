@@ -141,7 +141,11 @@ fn start_game(config: &mut GameConfig, first_time: bool) -> Option<::std::thread
                     return Some(::std::thread::spawn(|| Game::new(config).run()));
                 }
             }
-
+            // Hot-fix for a bug: window does not redraw after
+            // minimized and maximized again.
+            if let glium::glutin::Event::Focused(true) = event {
+                ui.needs_redraw();
+            }
             // Draw the GUI
             if let Some(whatever) = ui.draw_if_changed() {
                 renderer.fill(&display, whatever, &image_map);
