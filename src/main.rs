@@ -92,10 +92,10 @@ fn main() {
     };
 
     // Try to read config file, fallback to the default config otherwise
-    let config = File::open("resources/config.json").ok().and_then(|mut f| {
+    let mut config = File::open("resources/config.json").ok().and_then(|mut f| {
         let mut s = String::new();
         f.read_to_string(&mut s).ok().and_then(|_| serde_json::from_str(&s).ok())
     }).unwrap_or(default_config);
 
-    ui::start_game(config);
+    ui::main(&mut config);
 }
