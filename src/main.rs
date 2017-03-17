@@ -13,7 +13,6 @@ mod car;
 mod camera;
 mod bot;
 mod game;
-mod support;
 mod ui;
 
 // Pixel present a point in the window and window's size
