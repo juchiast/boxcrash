@@ -55,13 +55,18 @@ impl EventLoop {
     }
 }
 
+// Display a GUI to configs and start the game
+// Return a handle to the thread where the game's running
+// Return `None` if user want to exit
+// NOTE This funtion will change the value of game config
 fn start_game(config: &mut GameConfig, first_time: bool) -> Option<::std::thread::JoinHandle<()>> {
+    let (ui_width, ui_height) = (320, 240);
     let display = glium::glutin::WindowBuilder::new()
-        .with_dimensions(320, 240)
+        .with_dimensions(ui_width, ui_height)
         .with_title(config.title.as_ref())
         .build_glium()
         .expect("UI: Cannot build window");
-    let mut ui = ::conrod::UiBuilder::new([320., 240.]).build();
+    let mut ui = ::conrod::UiBuilder::new([ui_width as f64, ui_height as f64]).build();
     ui.fonts.insert_from_file("resources/Ubuntu-R.ttf").expect("UI: cannot load font");
     let mut renderer = Renderer::new(&display).expect("UI: cannot load renderer");
     let image_map = ::conrod::image::Map::<glium::texture::Texture2d>::new();
@@ -84,7 +89,7 @@ fn start_game(config: &mut GameConfig, first_time: bool) -> Option<::std::thread
             }
             if let glium::glutin::Event::Closed = event { return None; }
 
-            {
+            { // Setup all elements of UI
                 let ui = &mut ui.set_widgets();
                 let _canvas = widget::Canvas::new()
                     .color(GRAY.into())
@@ -114,6 +119,7 @@ fn start_game(config: &mut GameConfig, first_time: bool) -> Option<::std::thread
                     .label_font_size(14)
                     .set(ids.button, ui);
 
+                // Bind events for our widgets
                 for e in h_text_box {
                     if let widget::text_box::Event::Update(s) = e {
                         if s.is_empty() || s.parse::<u32>().is_ok() {
@@ -136,6 +142,7 @@ fn start_game(config: &mut GameConfig, first_time: bool) -> Option<::std::thread
                 }
             }
 
+            // Draw the GUI
             if let Some(whatever) = ui.draw_if_changed() {
                 renderer.fill(&display, whatever, &image_map);
                 let mut target = display.draw();
@@ -149,8 +156,8 @@ fn start_game(config: &mut GameConfig, first_time: bool) -> Option<::std::thread
 
 pub fn main(config: &mut GameConfig) {
     let mut first_time = true;
-    while let Some(th) = start_game(config, first_time) {
-        th.join().expect("Unexpected thread error");
+    while let Some(game_thread) = start_game(config, first_time) {
+        game_thread.join().expect("Unexpected thread error");
         first_time = false;
     }
 }
