@@ -137,6 +137,12 @@ impl Game {
             vec3(0., config.camera_height, -config.camera_distance) + player.pos()
         )
     }
+    // Re-calculate fps
+    fn update_fps(&mut self) {
+        let d = self.state.last_frame.elapsed();
+        self.state.last_frame = Instant::now();
+        self.state.fps = 1. / (d.as_secs() as f64 + 1e-9*d.subsec_nanos() as f64);
+    }
 
     pub fn run(&mut self) {
         while let Some(e) = self.window.next() {
@@ -144,10 +150,7 @@ impl Game {
                 Input::Press(key) => self.press(key),
                 Input::Release(key) => self.release(key),
                 Input::Render(_) => {
-                    // Calculate fps
-                    let d = self.state.last_frame.elapsed();
-                    self.state.last_frame = Instant::now();
-                    self.state.fps = 1. / (d.as_secs() as f64 + 1e-9*d.subsec_nanos() as f64);
+                    self.update_fps();
                     self.draw(&e);
                 },
                 Input::Update(args) => self.update(args.dt),
@@ -254,6 +257,9 @@ impl Game {
     }
     // `dt` stands for delta, duration since the last update
     fn update(&mut self, dt: f64) {
+        // Re-calculate delta according to fps
+        let dt = if self.state.fps != 0. { 1./self.state.fps}
+        else { dt };
         let old = self.world.player.position;
         if self.state.bullets <= 0 {
             self.state.recharge -= dt;
