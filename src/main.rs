@@ -16,6 +16,8 @@ mod bot;
 mod game;
 mod ui;
 
+type Rendered = Vec<([cgmath::Vector2<f64>; 2], color::Color)>;
+
 // Pixel present a point in the window and window's size
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Pixel {
