@@ -82,7 +82,7 @@ impl World {
 
         let bullets = self.bullets.clone();
         self.bots.retain(|x| x.pos().z > 0. && !bullets.iter().any(|b| x.hit(b)));
-        self.bots.sort_by(|a, b| a.pos().z.partial_cmp(&b.pos().z).unwrap());
+        self.bots.sort_by(|a, b| a.pos().z.partial_cmp(&b.pos().z).expect("Float compare failed"));
         let set = self.bots.iter().zip(self.bots.iter().skip(1)).enumerate()
             .filter(|&(_, (x, y))| x.crashed(y)).map(|(i, _)| i)
             .collect::<::std::collections::BTreeSet<_>>();
