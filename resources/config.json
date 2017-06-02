@@ -1,8 +1,8 @@
 {
     "title":"Box Crash",
     "screen_size":{
-        "w":1366,
-        "h":768
+        "w":800,
+        "h":600
     },
     "ups":60,
     "max_fps":60,

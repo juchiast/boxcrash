@@ -219,9 +219,9 @@ impl Game {
         macro_rules! bar {
             ($curr: expr, $full: expr) => {
                 [0.,
-                self.config.screen_size.h as f64 - 20.,
+                15.0,
                 self.config.screen_size.w as f64/2.*$curr/$full,
-                self.config.screen_size.h as f64,]
+                20.0,]
             };
         }
         let jump_bar = bar!(self.state.jump_timeout, self.config.jump_timeout);
@@ -253,7 +253,6 @@ impl Game {
                 rectangle(RED.into(), [x+w/2.-1., y+w/2.-1., 2., 2.], c.transform, g);
             });
         }
-
     }
     // `dt` stands for delta, duration since the last update
     fn update(&mut self, dt: f64) {
