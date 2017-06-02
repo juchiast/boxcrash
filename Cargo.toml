@@ -5,7 +5,7 @@ authors = ["Do Duy <doduycm@gmail.com>"]
 build = "build.rs"
 
 [dependencies]
-piston_window = "0.66"
+piston_window = "0.64"
 rand = "0.3"
 cgmath = "0.14"
 serde = "1.0"
