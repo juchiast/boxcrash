@@ -87,73 +87,75 @@ fn start_game(config: &mut GameConfig, first_time: bool) -> Option<::std::thread
                 ui.handle_event(event);
                 event_loop.needs_update();
             }
-            if let glium::glutin::Event::Closed = event { return None; }
+            match event {
+                // Break from the loop upon `Escape`.
+                glium::glutin::Event::KeyboardInput(_, _, Some(glium::glutin::VirtualKeyCode::Escape))
+                | glium::glutin::Event::Closed => return None,
+                // Window does not redraw after minimize and maximize again
+                glium::glutin::Event::Focused(true) => ui.needs_redraw(),
+                _ => {},
+            }
+        }
+        // Setup all elements of UI
+        {
+            let ui = &mut ui.set_widgets();
+            let _canvas = widget::Canvas::new()
+                .color(GRAY.into())
+                .set(ids.canvas, ui);
+            let w_text_box = widget::TextBox::new(&screen_w)
+                .mid_top_of(ids.canvas)
+                .w_h(120., 30.)
+                .font_size(14)
+                .set(ids.w_text_box, ui);
+            let h_text_box = widget::TextBox::new(&screen_h)
+                .down_from(ids.w_text_box, 2.)
+                .w_h(120., 30.)
+                .font_size(14)
+                .set(ids.h_text_box, ui);
+            let _w_label = widget::Text::new("Width: ")
+                .left_from(ids.w_text_box, 0.).align_middle_y_of(ids.w_text_box)
+                .font_size(14).color(WHITE.into())
+                .set(ids.w_label, ui);
+            let _h_label = widget::Text::new("Height: ")
+                .left_from(ids.h_text_box, 0.).align_middle_y_of(ids.h_text_box)
+                .font_size(14).color(WHITE.into())
+                .set(ids.h_label, ui);
+            let button = widget::Button::new()
+                .down_from(ids.h_text_box, 2.)
+                .w_h(120., 30.)
+                .label(if first_time {"Start game"} else {"Restart game"})
+                .label_font_size(14)
+                .set(ids.button, ui);
 
-            { // Setup all elements of UI
-                let ui = &mut ui.set_widgets();
-                let _canvas = widget::Canvas::new()
-                    .color(GRAY.into())
-                    .set(ids.canvas, ui);
-                let w_text_box = widget::TextBox::new(&screen_w)
-                    .mid_top_of(ids.canvas)
-                    .w_h(120., 30.)
-                    .font_size(14)
-                    .set(ids.w_text_box, ui);
-                let h_text_box = widget::TextBox::new(&screen_h)
-                    .down_from(ids.w_text_box, 2.)
-                    .w_h(120., 30.)
-                    .font_size(14)
-                    .set(ids.h_text_box, ui);
-                let _w_label = widget::Text::new("Width: ")
-                    .left_from(ids.w_text_box, 0.).align_middle_y_of(ids.w_text_box)
-                    .font_size(14).color(WHITE.into())
-                    .set(ids.w_label, ui);
-                let _h_label = widget::Text::new("Height: ")
-                    .left_from(ids.h_text_box, 0.).align_middle_y_of(ids.h_text_box)
-                    .font_size(14).color(WHITE.into())
-                    .set(ids.h_label, ui);
-                let button = widget::Button::new()
-                    .down_from(ids.h_text_box, 2.)
-                    .w_h(120., 30.)
-                    .label(if first_time {"Start game"} else {"Restart game"})
-                    .label_font_size(14)
-                    .set(ids.button, ui);
-
-                // Bind events for our widgets
-                for e in h_text_box {
-                    if let widget::text_box::Event::Update(s) = e {
-                        if s.is_empty() || s.parse::<u32>().is_ok() {
-                            screen_h = s;
-                        }
+            // Bind events for our widgets
+            for e in h_text_box {
+                if let widget::text_box::Event::Update(s) = e {
+                    if s.is_empty() || s.parse::<u32>().is_ok() {
+                        screen_h = s;
                     }
                 }
-                for e in w_text_box {
-                    if let widget::text_box::Event::Update(s) = e {
-                        if s.is_empty() || s.parse::<u32>().is_ok() {
-                            screen_w = s;
-                        }
+            }
+            for e in w_text_box {
+                if let widget::text_box::Event::Update(s) = e {
+                    if s.is_empty() || s.parse::<u32>().is_ok() {
+                        screen_w = s;
                     }
                 }
-                for _click in button {
-                    config.screen_size.w = screen_w.parse().unwrap_or(config.screen_size.w);
-                    config.screen_size.h = screen_h.parse().unwrap_or(config.screen_size.h);
-                    let config = config.clone();
-                    return Some(::std::thread::spawn(|| Game::new(config).run()));
-                }
             }
-            // Hot-fix for a bug: window does not redraw after
-            // minimized and maximized again.
-            if let glium::glutin::Event::Focused(true) = event {
-                ui.needs_redraw();
+            for _click in button {
+                config.screen_size.w = screen_w.parse().unwrap_or(config.screen_size.w);
+                config.screen_size.h = screen_h.parse().unwrap_or(config.screen_size.h);
+                let config = config.clone();
+                return Some(::std::thread::spawn(|| Game::new(config).run()));
             }
-            // Draw the GUI
-            if let Some(whatever) = ui.draw_if_changed() {
-                renderer.fill(&display, whatever, &image_map);
-                let mut target = display.draw();
-                target.clear_color(0., 0., 0., 1.);
-                renderer.draw(&display, &mut target, &image_map).expect("UI draw error");
-                target.finish().expect("UI 'finish' error");
-            }
+        }
+        // Draw the GUI
+        if let Some(whatever) = ui.draw_if_changed() {
+            renderer.fill(&display, whatever, &image_map);
+            let mut target = display.draw();
+            target.clear_color(0., 0., 0., 1.);
+            renderer.draw(&display, &mut target, &image_map).expect("UI draw error");
+            target.finish().expect("UI 'finish' error");
         }
     }
 }

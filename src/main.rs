@@ -40,6 +40,9 @@ use std::f64::consts::PI;
 use std::io::prelude::*;
 use std::fs::File;
 
+mod hello;
+mod ui2;
+
 fn main() {
     let default_config = GameConfig {
         title: "Box Crash".to_owned(),
