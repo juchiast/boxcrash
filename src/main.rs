@@ -80,6 +80,5 @@ fn main() {
         f.read_to_string(&mut s).ok().and_then(|_| serde_json::from_str(&s).ok())
     }).unwrap_or(default_config);
 
-    game::Game::new(config).run();
-    //ui::main(&mut config);
+    ui::main(&mut config);
 }
