@@ -10,6 +10,7 @@ use bot::BoxRules;
 use std::cell::RefCell;
 use std::ops::DerefMut;
 use std::time::Instant;
+use Pixel;
 
 // `Game` contains every things to run the game
 pub struct Game {
@@ -74,6 +75,44 @@ pub struct GameConfig {
     pub bullet_len: f64,
     pub bullet_speed: f64,
     pub zoom_in: bool, // If true, zoom-in while on stare mode
+}
+
+impl Default for GameConfig {
+    fn default() -> GameConfig {
+        use std::f64::consts::PI;
+        GameConfig {
+            title: "Box Crash".to_owned(),
+            screen_size: Pixel::new(800, 600),
+            ups: 60,
+            max_fps: 60,
+            tunel_size: [15., 8., 150.],
+            player_size: [1.5, 0.8, 3.],
+            player_speed: (20., 120.),
+            player_turn_speed: 15.,
+            bot_size: [(1., 4.), (0.5, 2.5), (2.5, 8.)],
+            bot_speed: (20., 120.),
+            bot_turn_speed: (5., 20.),
+            divider_size: [1., 7.],
+            camera_height: 3.,
+            camera_distance: 5.5,
+            decor_distance: 8.,
+            sprint_factor: 15.,
+            spawn_time: (0.25, 1.),
+            game_sprint: 1.,
+            game_max_speed: 80.,
+            player_jump_v: 7.,
+            player_jump_a: 5.,
+            jump_turn_decrease: 3.,
+            jump_timeout: 8.,
+            mouse_speed: PI/420.,
+            trueshot_distance: 100.,
+            bullet_stock: 15,
+            recharge_time: 10.,
+            bullet_len: 5.,
+            bullet_speed: 100.,
+            zoom_in: false,
+        }
+    }
 }
 
 impl Game {
