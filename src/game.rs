@@ -4,6 +4,7 @@ use color::*;
 use car::*;
 use bot::BoxRules;
 use Pixel;
+use control::{Flow, EventHandler};
 
 use std::cell::RefCell;
 use std::ops::DerefMut;
@@ -12,34 +13,6 @@ use std::time::Instant;
 use piston_window::*;
 use cgmath::{Vector2, vec3};
 use cgmath::prelude::*;
-
-// `Game` contains every things to run the game
-pub struct Game {
-    config: GameConfig,
-    world: World, // All objects in the game
-    bot_rules: BoxRules, // Rules to create a new bot
-    camera: Camera, // Camera for rendering
-    state: State, // Current state of game
-    // Wrap these caches in `RefCell` to allow interior mutability
-    glyphs: RefCell<Glyphs>, // Font cache
-    ellipse: RefCell<Ellipse>, // Model to draw a circle
-}
-
-struct State {
-    pub turn: Turn, // Presents movement of player
-    pub sprint: bool, // Player is speeding-up or not
-    pub spawn: f64, // Count down time to spawn a new bot
-    pub ended: bool, // Game is over or not
-    pub game_speed: f64, // Game speed in addition to player's speed
-    pub jump_timeout: f64, // Count down to allow the next jump
-    pub rotate_cam: bool, // Allow rotation of camera or not
-    pub bullets: i64, // The number of bullets left
-    pub recharge: f64, // Bullets recharge time
-    pub fps: f64, // Real fps of game
-    pub last_frame: Instant, // Moment of the last draw
-}
-
-pub enum Turn { Left, Right, None, }
 
 // Configurable game's contansts.
 // A tuple presents a range of something.
@@ -115,6 +88,34 @@ impl Default for GameConfig {
     }
 }
 
+// `Game` contains every things to run the game
+pub struct Game {
+    config: GameConfig,
+    world: World, // All objects in the game
+    bot_rules: BoxRules, // Rules to create a new bot
+    camera: Camera, // Camera for rendering
+    state: State, // Current state of game
+    // Wrap these caches in `RefCell` to allow interior mutability
+    glyphs: RefCell<Glyphs>, // Font cache
+    ellipse: RefCell<Ellipse>, // Model to draw a circle
+}
+
+struct State {
+    pub turn: Turn, // Presents movement of player
+    pub sprint: bool, // Player is speeding-up or not
+    pub spawn: f64, // Count down time to spawn a new bot
+    pub ended: bool, // Game is over or not
+    pub game_speed: f64, // Game speed in addition to player's speed
+    pub jump_timeout: f64, // Count down to allow the next jump
+    pub rotate_cam: bool, // Allow rotation of camera or not
+    pub bullets: i64, // The number of bullets left
+    pub recharge: f64, // Bullets recharge time
+    pub fps: f64, // Real fps of game
+    pub last_frame: Instant, // Moment of the last draw
+}
+
+pub enum Turn { Left, Right, None, }
+
 impl Game {
     pub fn new(config: GameConfig, window: &PistonWindow) -> Game {
         let glyphs = Glyphs::new("resources/Ubuntu-R.ttf", window.factory.clone())
@@ -175,19 +176,6 @@ impl Game {
         self.state.fps = 1. / (d.as_secs() as f64 + 1e-9*d.subsec_nanos() as f64);
     }
 
-    pub fn handle_event(&mut self, e: Input, window: &mut PistonWindow) {
-        match e {
-            Input::Press(key) => self.press(key),
-            Input::Release(key) => self.release(key),
-            Input::Render(_) => {
-                self.update_fps();
-                self.draw(&e, window);
-            },
-            Input::Update(args) => self.update(args.dt),
-            Input::Move(Motion::MouseRelative(a, b)) => self.mouse_move(a as f64, b as f64),
-            _ => {}
-        }
-    }
     fn mouse_move(&mut self, x: f64, y: f64) {
         if self.state.rotate_cam {
             self.camera.rotate(x*self.config.mouse_speed, y*self.config.mouse_speed, self.world.player.position);
@@ -323,6 +311,28 @@ impl Game {
         // Check for player's collision with bot
         if self.world.bots.iter().any(|x| self.world.player.crashed(&x.car)) {
             self.state.ended = true;
+        }
+    }
+}
+
+impl EventHandler for Game {
+    fn handle_event(&mut self, e: Input, window: &mut PistonWindow) -> Flow {
+        match e {
+            Input::Press(key) => self.press(key),
+            Input::Release(key) => self.release(key),
+            Input::Render(_) => {
+                self.update_fps();
+                self.draw(&e, window);
+            },
+            Input::Update(args) => self.update(args.dt),
+            Input::Move(Motion::MouseRelative(a, b)) => self.mouse_move(a as f64, b as f64),
+            _ => {}
+        }
+
+        if self.state.ended {
+            Flow::LoseGame
+        } else {
+            Flow::None
         }
     }
 }

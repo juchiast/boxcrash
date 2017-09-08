@@ -31,11 +31,13 @@ mod car;
 mod camera;
 mod bot;
 mod game;
+mod control;
 
 use piston_window::*;
-use game::GameConfig;
 use std::io::prelude::*;
 use std::fs::File;
+use game::GameConfig;
+use control::{Flow, EventHandler};
 
 fn main() {
     // Try to read config file, fallback to the default config otherwise
@@ -55,6 +57,10 @@ fn main() {
     let mut game = game::Game::new(config, &window);
 
     while let Some(event) = window.next() {
-        game.handle_event(event, &mut window);
+        let flow = game.handle_event(event, &mut window);
+
+        if let Flow::LoseGame = flow {
+            break;
+        }
     }
 }
