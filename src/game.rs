@@ -1,22 +1,22 @@
 use world::World;
-use piston_window::*;
 use camera::Camera;
-use cgmath::{Vector2, vec3};
-use cgmath::prelude::*;
 use color::*;
 use car::*;
-use piston_window::Ellipse;
 use bot::BoxRules;
+use Pixel;
+
 use std::cell::RefCell;
 use std::ops::DerefMut;
 use std::time::Instant;
-use Pixel;
+
+use piston_window::*;
+use cgmath::{Vector2, vec3};
+use cgmath::prelude::*;
 
 // `Game` contains every things to run the game
 pub struct Game {
     config: GameConfig,
     world: World, // All objects in the game
-    window: PistonWindow,
     bot_rules: BoxRules, // Rules to create a new bot
     camera: Camera, // Camera for rendering
     state: State, // Current state of game
@@ -116,14 +116,7 @@ impl Default for GameConfig {
 }
 
 impl Game {
-    pub fn new(config: GameConfig) -> Game {
-        let mut window: PistonWindow = WindowSettings::new(
-            config.title.clone(), [config.screen_size.w, config.screen_size.h])
-            .exit_on_esc(true).build()
-            .expect("Cannot create window.");
-        window.set_ups(config.ups);
-        window.set_max_fps(config.max_fps);
-        window.set_capture_cursor(true);
+    pub fn new(config: GameConfig, window: &PistonWindow) -> Game {
         let glyphs = Glyphs::new("resources/Ubuntu-R.ttf", window.factory.clone())
             .expect("Unable to load font.");
         let bot_rules = BoxRules {
@@ -161,7 +154,6 @@ impl Game {
         Game {
             config: config,
             world: world,
-            window: window,
             bot_rules: bot_rules,
             camera: camera,
             state: state,
@@ -183,22 +175,17 @@ impl Game {
         self.state.fps = 1. / (d.as_secs() as f64 + 1e-9*d.subsec_nanos() as f64);
     }
 
-    pub fn run(&mut self) {
-        while let Some(e) = self.window.next() {
-            match e {
-                Input::Press(key) => self.press(key),
-                Input::Release(key) => self.release(key),
-                Input::Render(_) => {
-                    self.update_fps();
-                    self.draw(&e);
-                },
-                Input::Update(args) => self.update(args.dt),
-                Input::Move(Motion::MouseRelative(a, b)) => self.mouse_move(a as f64, b as f64),
-                _ => {}
-            }
-            if self.state.ended {
-                break;
-            }
+    pub fn handle_event(&mut self, e: Input, window: &mut PistonWindow) {
+        match e {
+            Input::Press(key) => self.press(key),
+            Input::Release(key) => self.release(key),
+            Input::Render(_) => {
+                self.update_fps();
+                self.draw(&e, window);
+            },
+            Input::Update(args) => self.update(args.dt),
+            Input::Move(Motion::MouseRelative(a, b)) => self.mouse_move(a as f64, b as f64),
+            _ => {}
         }
     }
     fn mouse_move(&mut self, x: f64, y: f64) {
@@ -253,7 +240,7 @@ impl Game {
             _ => (),
         }
     }
-    fn draw(&mut self, e: &Input) {
+    fn draw(&mut self, e: &Input, window: &mut PistonWindow) {
         // Return a horizontal bar
         macro_rules! bar {
             ($curr: expr, $full: expr) => {
@@ -271,7 +258,7 @@ impl Game {
         let mut glyphs = self.glyphs.borrow_mut();
         let fps = format!("{:.3}", self.state.fps);
         let lines = self.world.render(&self.camera);
-        self.window.draw_2d(e, |c, g| {
+        window.draw_2d(e, |c, g| {
             clear(BLACK.into(), g);
             for (l, color) in lines {
                 line(color.into(), 1., convert(l), c.transform, g);
@@ -287,7 +274,7 @@ impl Game {
             let x = self.config.screen_size.w as f64 /2. - w/2.;
             let y = self.config.screen_size.h as f64 /2. - w/2.;
             let ellipse = self.ellipse.borrow();
-            self.window.draw_2d(e, |c, g| {
+            window.draw_2d(e, |c, g| {
                 ellipse.draw([x, y, w, w], &c.draw_state, c.transform, g);
                 rectangle(RED.into(), [x+w/2.-1., y+w/2.-1., 2., 2.], c.transform, g);
             });

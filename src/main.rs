@@ -31,8 +31,8 @@ mod car;
 mod camera;
 mod bot;
 mod game;
-mod ui;
 
+use piston_window::*;
 use game::GameConfig;
 use std::io::prelude::*;
 use std::fs::File;
@@ -44,5 +44,17 @@ fn main() {
         f.read_to_string(&mut s).ok().and_then(|_| serde_json::from_str(&s).ok())
     }).unwrap_or(GameConfig::default());
 
-    game::Game::new(config).run();
+    let mut window: PistonWindow = WindowSettings::new(
+        config.title.clone(), [config.screen_size.w, config.screen_size.h])
+        .exit_on_esc(true).build()
+        .expect("Cannot create window.");
+    window.set_ups(config.ups);
+    window.set_max_fps(config.max_fps);
+    window.set_capture_cursor(true);
+
+    let mut game = game::Game::new(config, &window);
+
+    while let Some(event) = window.next() {
+        game.handle_event(event, &mut window);
+    }
 }
