@@ -33,12 +33,15 @@ mod bot;
 mod game;
 mod control;
 mod conrod_helper;
+mod menu;
 
 use piston_window::*;
 use std::io::prelude::*;
 use std::fs::File;
 use game::GameConfig;
-use control::{Flow, EventHandler};
+use control::{Flow, EventHandler, State};
+use conrod_helper::ConrodUI;
+use menu::*;
 
 fn main() {
     // Try to read config file, fallback to the default config otherwise
@@ -47,8 +50,10 @@ fn main() {
         f.read_to_string(&mut s).ok().and_then(|_| serde_json::from_str(&s).ok())
     }).unwrap_or(GameConfig::default());
 
+    let size = config.screen_size.clone();
+
     let mut window: PistonWindow = WindowSettings::new(
-        config.title.clone(), [config.screen_size.w, config.screen_size.h])
+        config.title.clone(), [size.w, size.h])
         .exit_on_esc(true)
         .build()
         .expect("Cannot create window.");
@@ -56,15 +61,28 @@ fn main() {
     window.set_max_fps(config.max_fps);
     window.set_capture_cursor(true);
 
-    let mut game = game::Game::new(config, &window);
+    let mut game = game::Game::new(config.clone(), &window);
+    let mut start_menu: ConrodUI<StartMenu> = ConrodUI::new(size.clone(), &mut window);
+    let mut play_again_menu: ConrodUI<PlayAgainMenu> = ConrodUI::new(size.clone(), &mut window);
+
+    let mut state = State::StartMenu;
 
     while let Some(event) = window.next() {
-        let flow = game.handle_event(event, &mut window);
+        let flow = match state {
+            State::StartMenu => start_menu.handle_event(event, &mut window),
+            State::Playing => game.handle_event(event, &mut window),
+            State::PlayAgainMenu => play_again_menu.handle_event(event, &mut window),
+        };
 
         if let Some(flow) = flow {
             use Flow::*;
             match flow {
-                LoseGame => break,
+                StartGame => state = State::Playing,
+                LoseGame => state = State::PlayAgainMenu,
+                PlayAgain => {
+                    game = game::Game::new(config.clone(), &window);
+                    state = State::Playing;
+                },
             }
         }
     }

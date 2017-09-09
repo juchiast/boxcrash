@@ -12,7 +12,8 @@ use control::{Flow, EventHandler};
 pub trait Gui {
     type Ids;
 
-    fn gui(&mut self, ui: &mut UiCell, ids: &Self::Ids) -> Option<Flow>;
+    fn new() -> Self;
+    fn gui(&mut self, &mut UiCell, &Self::Ids) -> Option<Flow>;
     fn ids(&self, widget::id::Generator) -> Self::Ids;
 }
 
@@ -25,8 +26,10 @@ pub struct ConrodUI<G: Gui> {
 }
 
 impl<G: Gui> ConrodUI<G> {
-    fn new(gui: G, size: Pixel, window: &mut PistonWindow) -> ConrodUI<G> {
+    pub fn new(size: Pixel, window: &mut PistonWindow) -> ConrodUI<G> {
+        let gui = G::new();
         let mut ui = UiBuilder::new([size.w as f64, size.h as f64])
+            .theme(theme())
             .build();
 
         ui.fonts.insert_from_file("resources/Ubuntu-R.ttf")
@@ -101,5 +104,28 @@ impl<G: Gui> EventHandler for ConrodUI<G> {
         });
 
         flow
+    }
+}
+
+fn theme() -> conrod::Theme {
+    use conrod::position::{Padding, Position};
+    use std;
+    conrod::Theme {
+        name: "Demo Theme".to_string(),
+        padding: Padding::none(),
+        x_position: Position::Absolute(10.0),
+        y_position: Position::Absolute(10.0),
+        background_color: conrod::color::DARK_CHARCOAL,
+        shape_color: conrod::color::LIGHT_CHARCOAL,
+        border_color: conrod::color::BLACK,
+        border_width: 0.0,
+        label_color: conrod::color::WHITE,
+        font_id: None,
+        font_size_large: 26,
+        font_size_medium: 18,
+        font_size_small: 12,
+        widget_styling: conrod::theme::StyleMap::default(),
+        mouse_drag_threshold: 0.0,
+        double_click_threshold: std::time::Duration::from_millis(500),
     }
 }
