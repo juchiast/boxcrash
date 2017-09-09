@@ -69,7 +69,8 @@ impl Gui for PlayAgainMenu {
             .set(ids.button, ui);
 
         widget::Text::new("You lose!!")
-            .up_from(ids.button, 20.0)
+            .align_middle_x_of(ids.canvas)
+            .up_from(ids.button, 40.0)
             .set(ids.text, ui);
 
         for _click in button {
