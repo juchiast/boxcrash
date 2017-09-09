@@ -30,17 +30,17 @@ impl Gui for StartMenu {
 
         widget::Canvas::new().set(ids.canvas, ui);
 
-        let button = widget::Button::new()
+        let mut button = widget::Button::new()
             .middle_of(ids.canvas)
             .label("Start game")
             .w_h(120.0, 30.0)
             .set(ids.button, ui);
 
-        for _click in button {
-            return Some(Flow::StartGame);
+        if button.next().is_some() {
+            Some(Flow::StartGame)
+        } else {
+            None
         }
-
-        None
     }
 }
 
@@ -62,7 +62,7 @@ impl Gui for PlayAgainMenu {
 
         widget::Canvas::new().set(ids.canvas, ui);
 
-        let button = widget::Button::new()
+        let mut button = widget::Button::new()
             .middle_of(ids.canvas)
             .label("Play again")
             .w_h(120.0, 30.0)
@@ -73,10 +73,10 @@ impl Gui for PlayAgainMenu {
             .up_from(ids.button, 40.0)
             .set(ids.text, ui);
 
-        for _click in button {
-            return Some(Flow::PlayAgain);
+        if button.next().is_some() {
+            Some(Flow::PlayAgain)
+        } else {
+            None
         }
-
-        None
     }
 }
