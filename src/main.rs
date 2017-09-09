@@ -32,6 +32,7 @@ mod camera;
 mod bot;
 mod game;
 mod control;
+mod conrod_helper;
 
 use piston_window::*;
 use std::io::prelude::*;
