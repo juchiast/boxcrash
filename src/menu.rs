@@ -70,7 +70,7 @@ impl Gui for PlayAgainMenu {
 
         widget::Text::new("You lose!!")
             .align_middle_x_of(ids.canvas)
-            .up_from(ids.button, 40.0)
+            .up_from(ids.button, 30.0)
             .set(ids.text, ui);
 
         if button.next().is_some() {

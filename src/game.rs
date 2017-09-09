@@ -316,7 +316,8 @@ impl Game {
 }
 
 impl EventHandler for Game {
-    fn handle_event(&mut self, e: Input, window: &mut PistonWindow) -> Option<Flow> {
+    type Input = ();
+    fn handle_event(&mut self, e: Input, window: &mut PistonWindow, _: &mut Self::Input) -> Option<Flow> {
         match e {
             Input::Press(key) => self.press(key),
             Input::Release(key) => self.release(key),

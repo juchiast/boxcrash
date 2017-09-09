@@ -59,19 +59,23 @@ fn main() {
         .expect("Cannot create window.");
     window.set_ups(config.ups);
     window.set_max_fps(config.max_fps);
-    window.set_capture_cursor(true);
+
+    let mut ui = conrod::UiBuilder::new([size.w as f64, size.h as f64])
+        .theme(conrod_helper::theme())
+        .build();
+    ui.fonts.insert_from_file("resources/Ubuntu-R.ttf").unwrap();
+
+    let mut start_menu: ConrodUI<StartMenu> = ConrodUI::new(size.clone(), &mut window, &mut ui);
+    let mut play_again_menu: ConrodUI<PlayAgainMenu> = ConrodUI::new(size.clone(), &mut window, &mut ui);
+    let mut state = State::StartMenu;
 
     let mut game = game::Game::new(config.clone(), &window);
-    let mut start_menu: ConrodUI<StartMenu> = ConrodUI::new(size.clone(), &mut window);
-    let mut play_again_menu: ConrodUI<PlayAgainMenu> = ConrodUI::new(size.clone(), &mut window);
-
-    let mut state = State::StartMenu;
 
     while let Some(event) = window.next() {
         let flow = match state {
-            State::StartMenu => start_menu.handle_event(event, &mut window),
-            State::Playing => game.handle_event(event, &mut window),
-            State::PlayAgainMenu => play_again_menu.handle_event(event, &mut window),
+            State::StartMenu => start_menu.handle_event(event, &mut window, &mut ui),
+            State::Playing => game.handle_event(event, &mut window, &mut ()),
+            State::PlayAgainMenu => play_again_menu.handle_event(event, &mut window, &mut ui),
         };
 
         if let Some(flow) = flow {
@@ -80,8 +84,8 @@ fn main() {
                 StartGame => state = State::Playing,
                 LoseGame => state = State::PlayAgainMenu,
                 PlayAgain => {
-                    game = game::Game::new(config.clone(), &window);
                     state = State::Playing;
+                    game = game::Game::new(config.clone(), &window);
                 },
             }
         }
