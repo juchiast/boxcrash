@@ -48,7 +48,8 @@ fn main() {
 
     let mut window: PistonWindow = WindowSettings::new(
         config.title.clone(), [config.screen_size.w, config.screen_size.h])
-        .exit_on_esc(true).build()
+        .exit_on_esc(true)
+        .build()
         .expect("Cannot create window.");
     window.set_ups(config.ups);
     window.set_max_fps(config.max_fps);
@@ -59,8 +60,11 @@ fn main() {
     while let Some(event) = window.next() {
         let flow = game.handle_event(event, &mut window);
 
-        if let Flow::LoseGame = flow {
-            break;
+        if let Some(flow) = flow {
+            use Flow::*;
+            match flow {
+                LoseGame => break,
+            }
         }
     }
 }

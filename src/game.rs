@@ -316,7 +316,7 @@ impl Game {
 }
 
 impl EventHandler for Game {
-    fn handle_event(&mut self, e: Input, window: &mut PistonWindow) -> Flow {
+    fn handle_event(&mut self, e: Input, window: &mut PistonWindow) -> Option<Flow> {
         match e {
             Input::Press(key) => self.press(key),
             Input::Release(key) => self.release(key),
@@ -330,9 +330,9 @@ impl EventHandler for Game {
         }
 
         if self.state.ended {
-            Flow::LoseGame
+            Some(Flow::LoseGame)
         } else {
-            Flow::None
+            None
         }
     }
 }
