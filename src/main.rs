@@ -44,6 +44,9 @@ use conrod_helper::ConrodUI;
 use menu::*;
 
 fn main() {
+    // Wayland backend contains some bugs, prefer x11
+    std::env::set_var("WINIT_UNIX_BACKEND", "x11");
+
     // Try to read config file, fallback to the default config otherwise
     let config: GameConfig = File::open("resources/config.json").ok().and_then(|mut f| {
         let mut s = String::new();

@@ -1,4 +1,4 @@
-use piston_window::{Input, PistonWindow};
+use piston_window::{Event, PistonWindow};
 
 pub enum Flow {
     StartGame,
@@ -14,5 +14,5 @@ pub enum State {
 
 pub trait EventHandler {
     type Input;
-    fn handle_event(&mut self, Input, &mut PistonWindow, &mut Self::Input) -> Option<Flow>;
+    fn handle_event(&mut self, Event, &mut PistonWindow, &mut Self::Input) -> Option<Flow>;
 }

@@ -118,7 +118,7 @@ pub enum Turn { Left, Right, None, }
 
 impl Game {
     pub fn new(config: GameConfig, window: &PistonWindow) -> Game {
-        let glyphs = Glyphs::new("resources/Ubuntu-R.ttf", window.factory.clone())
+        let glyphs = Glyphs::new("resources/Ubuntu-R.ttf", window.factory.clone(), texture::TextureSettings::new())
             .expect("Unable to load font.");
         let bot_rules = BoxRules {
             size: config.bot_size,
@@ -228,7 +228,7 @@ impl Game {
             _ => (),
         }
     }
-    fn draw(&mut self, e: &Input, window: &mut PistonWindow) {
+    fn draw(&mut self, e: &Event, window: &mut PistonWindow) {
         // Return a horizontal bar
         macro_rules! bar {
             ($curr: expr, $full: expr) => {
@@ -317,16 +317,25 @@ impl Game {
 
 impl EventHandler for Game {
     type Input = ();
-    fn handle_event(&mut self, e: Input, window: &mut PistonWindow, _: &mut Self::Input) -> Option<Flow> {
+    fn handle_event(&mut self, e: Event, window: &mut PistonWindow, _: &mut Self::Input) -> Option<Flow> {
+        use Input::*;
+        use Loop::*;
+        use Motion::*;
+        use Event::*;
         match e {
-            Input::Press(key) => self.press(key),
-            Input::Release(key) => self.release(key),
-            Input::Render(_) => {
+            Loop(Render(_)) => {
                 self.update_fps();
                 self.draw(&e, window);
             },
-            Input::Update(args) => self.update(args.dt),
-            Input::Move(Motion::MouseRelative(a, b)) => self.mouse_move(a as f64, b as f64),
+            Loop(Update(args)) => self.update(args.dt),
+            Input(Button(args)) => {
+                use ButtonState::*;
+                match args.state {
+                    Press => self.press(args.button),
+                    Release => self.release(args.button),
+                }
+            },
+            Input(Move(MouseRelative(a, b))) => self.mouse_move(a as f64, b as f64),
             _ => {}
         }
 

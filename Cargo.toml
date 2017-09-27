@@ -5,7 +5,7 @@ authors = ["Do Duy <doduycm@gmail.com>"]
 build = "build.rs"
 
 [dependencies]
-piston_window = "0.65"
+piston_window = "0.70"
 rand = "0.3.15"
 cgmath = "0.14"
 serde = "1.0"
@@ -13,5 +13,5 @@ serde_derive = "1.0"
 serde_json = "1.0"
 
 [dependencies.conrod]
-version = "0.54"
+version = "0.55"
 features = ["piston"]

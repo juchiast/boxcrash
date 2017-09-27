@@ -1,4 +1,4 @@
-use piston_window::{G2d, UpdateEvent, Input, Window, PistonWindow, G2dTexture, TextureSettings};
+use piston_window::{G2d, UpdateEvent, Event, Window, PistonWindow, G2dTexture, TextureSettings};
 use piston_window::texture::UpdateTexture;
 use piston_window;
 use conrod::UiCell;
@@ -54,7 +54,7 @@ impl<G: Gui> ConrodUI<G> {
 
 impl<G: Gui> EventHandler for ConrodUI<G> {
     type Input = conrod::Ui;
-    fn handle_event(&mut self, event: Input, window: &mut PistonWindow, ui: &mut Self::Input) -> Option<Flow> {
+    fn handle_event(&mut self, event: Event, window: &mut PistonWindow, ui: &mut Self::Input) -> Option<Flow> {
         let size = window.size();
         let (win_w, win_h) = (size.width as f64, size.height as f64);
         if let Some(e) = conrod::backend::piston::event::convert(event.clone(), win_w, win_h) {
