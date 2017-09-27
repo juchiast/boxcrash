@@ -149,7 +149,7 @@ impl Game {
                 color: RED.alpha(0.5).into(),
                 radius: 1.,
             }),
-            resolution: 16,
+            resolution: 8,
         };
 
         Game {
