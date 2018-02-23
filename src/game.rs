@@ -4,7 +4,7 @@ use color::*;
 use car::*;
 use bot::BoxRules;
 use Pixel;
-use control::{Flow, EventHandler};
+use control::{EventHandler, Flow};
 
 use std::cell::RefCell;
 use std::ops::DerefMut;
@@ -30,9 +30,9 @@ pub struct GameConfig {
     pub bot_speed: (f64, f64),
     pub bot_turn_speed: (f64, f64),
     pub divider_size: [f64; 2],
-    pub camera_height: f64, // Height of camera (from player)
+    pub camera_height: f64,   // Height of camera (from player)
     pub camera_distance: f64, // Distance from camera to player
-    pub decor_distance: f64, // Distance between each decoration
+    pub decor_distance: f64,  // Distance between each decoration
     pub sprint_factor: f64,
     pub spawn_time: (f64, f64),
     pub game_sprint: f64, // The increase of game_speed
@@ -77,7 +77,7 @@ impl Default for GameConfig {
             player_jump_a: 5.,
             jump_turn_decrease: 3.,
             jump_timeout: 8.,
-            mouse_speed: PI/420.,
+            mouse_speed: PI / 420.,
             trueshot_distance: 100.,
             bullet_stock: 15,
             recharge_time: 10.,
@@ -91,38 +91,49 @@ impl Default for GameConfig {
 // `Game` contains every things to run the game
 pub struct Game {
     config: GameConfig,
-    world: World, // All objects in the game
+    world: World,        // All objects in the game
     bot_rules: BoxRules, // Rules to create a new bot
-    camera: Camera, // Camera for rendering
-    state: State, // Current state of game
+    camera: Camera,      // Camera for rendering
+    state: State,        // Current state of game
     // Wrap these caches in `RefCell` to allow interior mutability
-    glyphs: RefCell<Glyphs>, // Font cache
+    glyphs: RefCell<Glyphs>,   // Font cache
     ellipse: RefCell<Ellipse>, // Model to draw a circle
 }
 
 struct State {
-    pub turn: Turn, // Presents movement of player
-    pub sprint: bool, // Player is speeding-up or not
-    pub spawn: f64, // Count down time to spawn a new bot
-    pub ended: bool, // Game is over or not
-    pub game_speed: f64, // Game speed in addition to player's speed
-    pub jump_timeout: f64, // Count down to allow the next jump
-    pub rotate_cam: bool, // Allow rotation of camera or not
-    pub bullets: i64, // The number of bullets left
-    pub recharge: f64, // Bullets recharge time
-    pub fps: f64, // Real fps of game
+    pub turn: Turn,          // Presents movement of player
+    pub sprint: bool,        // Player is speeding-up or not
+    pub spawn: f64,          // Count down time to spawn a new bot
+    pub ended: bool,         // Game is over or not
+    pub game_speed: f64,     // Game speed in addition to player's speed
+    pub jump_timeout: f64,   // Count down to allow the next jump
+    pub rotate_cam: bool,    // Allow rotation of camera or not
+    pub bullets: i64,        // The number of bullets left
+    pub recharge: f64,       // Bullets recharge time
+    pub fps: f64,            // Real fps of game
     pub last_frame: Instant, // Moment of the last draw
 }
 
-pub enum Turn { Left, Right, None, }
+pub enum Turn {
+    Left,
+    Right,
+    None,
+}
 
 impl Game {
     pub fn new(config: GameConfig, window: &PistonWindow) -> Game {
-        let glyphs = Glyphs::new("resources/Ubuntu-R.ttf", window.factory.clone(), texture::TextureSettings::new())
-            .expect("Unable to load font.");
+        let glyphs = Glyphs::new(
+            "resources/Ubuntu-R.ttf",
+            window.factory.clone(),
+            texture::TextureSettings::new(),
+        ).expect("Unable to load font.");
         let bot_rules = BoxRules {
             size: config.bot_size,
-            position: [(0., config.tunel_size[0]), (0., 0.), (config.tunel_size[2], config.tunel_size[2])],
+            position: [
+                (0., config.tunel_size[0]),
+                (0., 0.),
+                (config.tunel_size[2], config.tunel_size[2]),
+            ],
             speed: config.bot_speed,
             turn_speed: config.bot_turn_speed,
             color: vec![RED, ORANGE, VIOLET, GREEN, PALE],
@@ -166,19 +177,23 @@ impl Game {
     fn new_camera<T: Car>(config: &GameConfig, player: &T) -> Camera {
         Camera::new(
             config.screen_size.clone(),
-            vec3(0., config.camera_height, -config.camera_distance) + player.pos()
+            vec3(0., config.camera_height, -config.camera_distance) + player.pos(),
         )
     }
     // Re-calculate fps
     fn update_fps(&mut self) {
         let d = self.state.last_frame.elapsed();
         self.state.last_frame = Instant::now();
-        self.state.fps = 1. / (d.as_secs() as f64 + 1e-9*d.subsec_nanos() as f64);
+        self.state.fps = 1. / (d.as_secs() as f64 + 1e-9 * d.subsec_nanos() as f64);
     }
 
     fn mouse_move(&mut self, x: f64, y: f64) {
         if self.state.rotate_cam {
-            self.camera.rotate(x*self.config.mouse_speed, y*self.config.mouse_speed, self.world.player.position);
+            self.camera.rotate(
+                x * self.config.mouse_speed,
+                y * self.config.mouse_speed,
+                self.world.player.position,
+            );
         }
     }
     fn press(&mut self, key: Button) {
@@ -195,20 +210,26 @@ impl Game {
                     self.camera.zoom_in();
                 }
                 self.state.rotate_cam = true;
-            },
-            Button::Mouse(MouseButton::Left) => if self.state.rotate_cam && self.state.bullets > 0 {
-                let mut pos = self.world.player.position;
-                pos.y += self.world.player.size.y;
-                let mut d = vec3(0., 0., self.config.trueshot_distance + self.config.camera_distance);
-                d = self.camera.c * d.magnitude2() / d.dot(self.camera.c);
-                d = self.camera.eye + d - pos;
-                d = d * self.config.bullet_speed / d.magnitude();
-                self.world.add_bullet(pos, d, self.config.bullet_len);
-                self.state.bullets -= 1;
-                if self.state.bullets <= 0 {
-                    self.state.recharge = self.config.recharge_time;
+            }
+            Button::Mouse(MouseButton::Left) => {
+                if self.state.rotate_cam && self.state.bullets > 0 {
+                    let mut pos = self.world.player.position;
+                    pos.y += self.world.player.size.y;
+                    let mut d = vec3(
+                        0.,
+                        0.,
+                        self.config.trueshot_distance + self.config.camera_distance,
+                    );
+                    d = self.camera.c * d.magnitude2() / d.dot(self.camera.c);
+                    d = self.camera.eye + d - pos;
+                    d = d * self.config.bullet_speed / d.magnitude();
+                    self.world.add_bullet(pos, d, self.config.bullet_len);
+                    self.state.bullets -= 1;
+                    if self.state.bullets <= 0 {
+                        self.state.recharge = self.config.recharge_time;
+                    }
                 }
-            },
+            }
             _ => (),
         }
     }
@@ -224,7 +245,7 @@ impl Game {
             Button::Mouse(MouseButton::Right) => {
                 self.state.rotate_cam = false;
                 self.camera = Game::new_camera(&self.config, &self.world.player);
-            },
+            }
             _ => (),
         }
     }
@@ -254,25 +275,40 @@ impl Game {
             rectangle(BLUE.alpha(0.4).into(), jump_bar, c.transform, g);
             rectangle(RED.alpha(0.4).into(), recharge_bar, c.transform, g);
             rectangle(GREEN.alpha(0.4).into(), bullets_bar, c.transform, g);
-            text(WHITE.into(), 10, &fps, glyphs.deref_mut(), c.transform.trans(0., 10.), g);
+            text(
+                WHITE.into(),
+                10,
+                &fps,
+                glyphs.deref_mut(),
+                c.transform.trans(0., 10.),
+                g,
+            );
         });
 
         if self.state.rotate_cam {
             let w = 20.;
-            let x = self.config.screen_size.w as f64 /2. - w/2.;
-            let y = self.config.screen_size.h as f64 /2. - w/2.;
+            let x = self.config.screen_size.w as f64 / 2. - w / 2.;
+            let y = self.config.screen_size.h as f64 / 2. - w / 2.;
             let ellipse = self.ellipse.borrow();
             window.draw_2d(e, |c, g| {
                 ellipse.draw([x, y, w, w], &c.draw_state, c.transform, g);
-                rectangle(RED.into(), [x+w/2.-1., y+w/2.-1., 2., 2.], c.transform, g);
+                rectangle(
+                    RED.into(),
+                    [x + w / 2. - 1., y + w / 2. - 1., 2., 2.],
+                    c.transform,
+                    g,
+                );
             });
         }
     }
     // `dt` stands for delta, duration since the last update
     fn update(&mut self, dt: f64) {
         // Re-calculate delta according to fps
-        let dt = if self.state.fps != 0. { 1./self.state.fps}
-        else { dt };
+        let dt = if self.state.fps != 0. {
+            1. / self.state.fps
+        } else {
+            dt
+        };
         let old = self.world.player.position;
         if self.state.bullets <= 0 {
             self.state.recharge -= dt;
@@ -282,14 +318,14 @@ impl Game {
         }
         self.state.jump_timeout -= dt;
         if self.state.game_speed < self.config.game_max_speed {
-            self.state.game_speed += dt*self.config.game_sprint;
+            self.state.game_speed += dt * self.config.game_sprint;
         }
         if self.state.sprint {
             if self.world.player.speed < self.config.player_speed.1 {
-                self.world.player.speed += dt*self.config.sprint_factor;
+                self.world.player.speed += dt * self.config.sprint_factor;
             }
         } else if self.world.player.speed > self.config.player_speed.0 {
-            self.world.player.speed -= dt*self.config.sprint_factor;
+            self.world.player.speed -= dt * self.config.sprint_factor;
         }
         self.state.spawn -= dt;
         if self.state.spawn < 0. {
@@ -309,7 +345,11 @@ impl Game {
         // Update camera's location
         self.camera.eye += self.world.player.position - old;
         // Check for player's collision with bot
-        if self.world.bots.iter().any(|x| self.world.player.crashed(&x.car)) {
+        if self.world
+            .bots
+            .iter()
+            .any(|x| self.world.player.crashed(&x.car))
+        {
             self.state.ended = true;
         }
     }
@@ -317,7 +357,12 @@ impl Game {
 
 impl EventHandler for Game {
     type Input = ();
-    fn handle_event(&mut self, e: Event, window: &mut PistonWindow, _: &mut Self::Input) -> Option<Flow> {
+    fn handle_event(
+        &mut self,
+        e: Event,
+        window: &mut PistonWindow,
+        _: &mut Self::Input,
+    ) -> Option<Flow> {
         use Input::*;
         use Loop::*;
         use Motion::*;
@@ -326,7 +371,7 @@ impl EventHandler for Game {
             Loop(Render(_)) => {
                 self.update_fps();
                 self.draw(&e, window);
-            },
+            }
             Loop(Update(args)) => self.update(args.dt),
             Input(Button(args)) => {
                 use ButtonState::*;
@@ -334,7 +379,7 @@ impl EventHandler for Game {
                     Press => self.press(args.button),
                     Release => self.release(args.button),
                 }
-            },
+            }
             Input(Move(MouseRelative(a, b))) => self.mouse_move(a as f64, b as f64),
             _ => {}
         }

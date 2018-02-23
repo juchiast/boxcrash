@@ -1,7 +1,7 @@
 use cgmath::{Vector2, Vector3, vec3};
 use cgmath::prelude::*;
 
-const MAX_CAM_WIDTH: f64 = 1.0; 
+const MAX_CAM_WIDTH: f64 = 1.0;
 
 // A struct to render points and lines in 3D plane to the screen
 #[derive(Clone)]
@@ -32,11 +32,11 @@ impl Camera {
     // Render a single point, return None if we can't see it
     pub fn render(&self, x: &Vector3<f64>) -> Option<Vector2<f64>> {
         let centre = self.eye + self.c;
-        let side = |x: &Vector3<f64>| self.c.dot(x-centre);
-        if side(x)*side(&self.eye) > 0. {
+        let side = |x: &Vector3<f64>| self.c.dot(x - centre);
+        if side(x) * side(&self.eye) > 0. {
             None
         } else {
-            let x = (self.c.magnitude2()/self.c.dot(x-self.eye))*(x-self.eye) - self.c;
+            let x = (self.c.magnitude2() / self.c.dot(x - self.eye)) * (x - self.eye) - self.c;
             Some(self.transform(&x))
         }
     }
@@ -49,32 +49,34 @@ impl Camera {
         } else if x1.is_none() && y1.is_none() {
             None
         } else {
-            let (a, v) = if x1.is_some() { (x, y-x) } else { (y, x-y) };
-            let t = self.c.dot(centre-a) / self.c.dot(v);
-            let x = t*v + a - centre;
-            Some([
-                 x1.unwrap_or_else(|| y1.unwrap()),
-                 self.transform(&x)
-            ])
+            let (a, v) = if x1.is_some() { (x, y - x) } else { (y, x - y) };
+            let t = self.c.dot(centre - a) / self.c.dot(v);
+            let x = t * v + a - centre;
+            Some([x1.unwrap_or_else(|| y1.unwrap()), self.transform(&x)])
         }
     }
 
     fn transform(&self, x: &Vector3<f64>) -> Vector2<f64> {
         if f64::abs(self.c.dot(*x)) > 1e-9 {
-            panic!("Unexpected error in `fn Camera::transform`: {:?} {:?}, {}", self.c, x, self.c.dot(x.clone()));
+            panic!(
+                "Unexpected error in `fn Camera::transform`: {:?} {:?}, {}",
+                self.c,
+                x,
+                self.c.dot(x.clone())
+            );
         }
-        let a = x.dot(self.axis_x)/self.axis_x.magnitude();
-        let b = x.dot(self.axis_y)/self.axis_y.magnitude();
-        let w = a*self.zoom_factor + self.screen_size.w as f64 / 2.;
-        let h = self.screen_size.h as f64 - (b*self.zoom_factor+self.screen_size.h as f64 / 2.);
+        let a = x.dot(self.axis_x) / self.axis_x.magnitude();
+        let b = x.dot(self.axis_y) / self.axis_y.magnitude();
+        let w = a * self.zoom_factor + self.screen_size.w as f64 / 2.;
+        let h = self.screen_size.h as f64 - (b * self.zoom_factor + self.screen_size.h as f64 / 2.);
         Vector2::new(w, h)
     }
 
-    // Rotate the camera's direction around a centre and 
+    // Rotate the camera's direction around a centre and
     // the Ox, Oy axis (3D plane axis).
     // `x`, `y` is degree measured in Radian.
     pub fn rotate(&mut self, y: f64, x: f64, centre: Vector3<f64>) {
-        use cgmath::{Basis3, Rotation3, Rad};
+        use cgmath::{Basis3, Rad, Rotation3};
         let mut vec = self.eye - centre;
         let rotate_x = Basis3::from_angle_x(Rad(x));
         let rotate_y = Basis3::from_angle_y(Rad(y));

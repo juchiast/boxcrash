@@ -26,13 +26,13 @@ impl Into<::conrod::Color> for Color {
     }
 }
 
-pub const BLACK:    Color = Color([0.0, 0.0, 0.0, 1.0]);
-pub const GREEN:    Color = Color([0.0, 1.0, 0.0, 1.0]);
-pub const BLUE:     Color = Color([0.0, 0.0, 1.0, 1.0]);
-pub const ORANGE:   Color = Color([1.0, 0.5, 0.0, 1.0]);
-pub const RED:      Color = Color([1.0, 0.0, 0.0, 1.0]);
-pub const VIOLET:   Color = Color([0.6, 0.0, 1.0, 1.0]);
-pub const YELLOW:   Color = Color([1.0, 1.0, 0.0, 1.0]);
-pub const WHITE:    Color = Color([1.0, 1.0, 1.0, 1.0]);
-pub const PALE:     Color = Color([0.3, 0.3, 0.3, 0.1]);
-pub const GRAY:     Color = Color([0.6, 0.6, 0.6, 1.0]);
+pub const BLACK: Color = Color([0.0, 0.0, 0.0, 1.0]);
+pub const GREEN: Color = Color([0.0, 1.0, 0.0, 1.0]);
+pub const BLUE: Color = Color([0.0, 0.0, 1.0, 1.0]);
+pub const ORANGE: Color = Color([1.0, 0.5, 0.0, 1.0]);
+pub const RED: Color = Color([1.0, 0.0, 0.0, 1.0]);
+pub const VIOLET: Color = Color([0.6, 0.0, 1.0, 1.0]);
+pub const YELLOW: Color = Color([1.0, 1.0, 0.0, 1.0]);
+pub const WHITE: Color = Color([1.0, 1.0, 1.0, 1.0]);
+pub const PALE: Color = Color([0.3, 0.3, 0.3, 0.1]);
+pub const GRAY: Color = Color([0.6, 0.6, 0.6, 1.0]);

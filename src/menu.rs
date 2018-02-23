@@ -26,7 +26,7 @@ impl Gui for StartMenu {
     }
 
     fn gui(&mut self, ui: &mut UiCell, ids: &Self::Ids) -> Option<Flow> {
-        use conrod::{Widget, Positionable, Sizeable, Labelable};
+        use conrod::{Labelable, Positionable, Sizeable, Widget};
 
         widget::Canvas::new().set(ids.canvas, ui);
 
@@ -58,7 +58,7 @@ impl Gui for PlayAgainMenu {
     }
 
     fn gui(&mut self, ui: &mut UiCell, ids: &Self::Ids) -> Option<Flow> {
-        use conrod::{Widget, Positionable, Sizeable, Labelable};
+        use conrod::{Labelable, Positionable, Sizeable, Widget};
 
         widget::Canvas::new().set(ids.canvas, ui);
 

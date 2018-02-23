@@ -1,4 +1,4 @@
-use piston_window::{G2d, UpdateEvent, Event, Window, PistonWindow, G2dTexture, TextureSettings};
+use piston_window::{Event, G2d, G2dTexture, PistonWindow, TextureSettings, UpdateEvent, Window};
 use piston_window::texture::UpdateTexture;
 use piston_window;
 use conrod::UiCell;
@@ -7,7 +7,7 @@ use conrod::text::GlyphCache;
 use conrod;
 
 use Pixel;
-use control::{Flow, EventHandler};
+use control::{EventHandler, Flow};
 
 pub trait Gui {
     type Ids;
@@ -37,9 +37,10 @@ impl<G: Gui> ConrodUI<G> {
             let init = vec![128; buffer_len];
             let settings = TextureSettings::new();
             let factory = &mut window.factory;
-            let texture = G2dTexture::from_memory_alpha(factory, &init, size.w, size.h, &settings).unwrap();
+            let texture =
+                G2dTexture::from_memory_alpha(factory, &init, size.w, size.h, &settings).unwrap();
             (cache, texture)
-        };  
+        };
 
         let ids = gui.ids(ui.widget_id_generator());
 
@@ -54,7 +55,12 @@ impl<G: Gui> ConrodUI<G> {
 
 impl<G: Gui> EventHandler for ConrodUI<G> {
     type Input = conrod::Ui;
-    fn handle_event(&mut self, event: Event, window: &mut PistonWindow, ui: &mut Self::Input) -> Option<Flow> {
+    fn handle_event(
+        &mut self,
+        event: Event,
+        window: &mut PistonWindow,
+        ui: &mut Self::Input,
+    ) -> Option<Flow> {
         let size = window.size();
         let (win_w, win_h) = (size.width as f64, size.height as f64);
         if let Some(e) = conrod::backend::piston::event::convert(event.clone(), win_w, win_h) {
@@ -70,29 +76,39 @@ impl<G: Gui> EventHandler for ConrodUI<G> {
         window.draw_2d(&event, |context, graphics| {
             if let Some(primitives) = ui.draw_if_changed() {
                 let cache_queued_glyphs = |graphics: &mut G2d,
-                cache: &mut G2dTexture,
-                rect: conrod::text::rt::Rect<u32>,
-                data: &[u8]|
-                {
+                                           cache: &mut G2dTexture,
+                                           rect: conrod::text::rt::Rect<u32>,
+                                           data: &[u8]| {
                     let offset = [rect.min.x, rect.min.y];
                     let size = [rect.width(), rect.height()];
                     let format = piston_window::texture::Format::Rgba8;
                     let encoder = &mut graphics.encoder;
-                    let text_vertex_data: Vec<_> = data.iter().flat_map(|&b| vec![255, 255, 255, b]).collect();
-                    UpdateTexture::update(cache, encoder, format, &text_vertex_data[..], offset, size)
-                        .expect("failed to update texture");
+                    let text_vertex_data: Vec<_> =
+                        data.iter().flat_map(|&b| vec![255, 255, 255, b]).collect();
+                    UpdateTexture::update(
+                        cache,
+                        encoder,
+                        format,
+                        &text_vertex_data[..],
+                        offset,
+                        size,
+                    ).expect("failed to update texture");
                 };
 
-                fn texture_from_image<T>(img: &T) -> &T { img }
+                fn texture_from_image<T>(img: &T) -> &T {
+                    img
+                }
 
-                conrod::backend::piston::draw::primitives(primitives,
-                                                          context,
-                                                          graphics,
-                                                          &mut self.text_texture_cache,
-                                                          &mut self.glyph_cache,
-                                                          &conrod::image::Map::new(),
-                                                          cache_queued_glyphs,
-                                                          texture_from_image);
+                conrod::backend::piston::draw::primitives(
+                    primitives,
+                    context,
+                    graphics,
+                    &mut self.text_texture_cache,
+                    &mut self.glyph_cache,
+                    &conrod::image::Map::new(),
+                    cache_queued_glyphs,
+                    texture_from_image,
+                );
             }
         });
 

@@ -44,10 +44,14 @@ impl Action {
 
 impl Bot {
     pub fn new_random(rules: &BoxRules) -> Bot {
-        Bot{
+        Bot {
             car: BoxCar {
                 size: vec3(rnd(rules.size[0]), rnd(rules.size[1]), rnd(rules.size[2])),
-                position: vec3(rnd(rules.position[0]), rnd(rules.position[1]), rnd(rules.position[2])),
+                position: vec3(
+                    rnd(rules.position[0]),
+                    rnd(rules.position[1]),
+                    rnd(rules.position[2]),
+                ),
                 speed: rnd(rules.speed),
                 turn_speed: rnd(rules.turn_speed),
                 color: if rules.color.is_empty() {
@@ -61,7 +65,9 @@ impl Bot {
                 current_t: 0.,
                 jump_turn_decrease: rules.jump_turn_decrease,
             },
-            actions: (0..::rand::random::<usize>()%6).map(|_| Action::rand()).collect(),
+            actions: (0..::rand::random::<usize>() % 6)
+                .map(|_| Action::rand())
+                .collect(),
         }
     }
     pub fn drive(&mut self, dt: f64) {

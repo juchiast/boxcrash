@@ -1,9 +1,11 @@
-extern crate rand;
 extern crate cgmath;
+#[macro_use]
+extern crate conrod;
 extern crate piston_window;
-#[macro_use] extern crate serde_derive;
+extern crate rand;
+#[macro_use]
+extern crate serde_derive;
 extern crate serde_json;
-#[macro_use] extern crate conrod;
 
 type Rendered = Vec<([cgmath::Vector2<f64>; 2], color::Color)>;
 
@@ -14,14 +16,16 @@ pub struct Pixel {
     pub h: u32,
 }
 impl Pixel {
-    pub fn new(w: u32, h: u32) -> Pixel { Pixel {w: w, h: h} }
+    pub fn new(w: u32, h: u32) -> Pixel {
+        Pixel { w: w, h: h }
+    }
 }
 
 // Return a random number between a and b
 fn rnd((a, b): (f64, f64)) -> f64 {
     let (a, b) = (f64::min(a, b), f64::max(a, b));
     // `random::<f64>()` return a number between 0 and 1
-    rand::random::<f64>()*(b-a) + a
+    rand::random::<f64>() * (b - a) + a
 }
 
 mod color;
@@ -39,7 +43,7 @@ use piston_window::*;
 use std::io::prelude::*;
 use std::fs::File;
 use game::GameConfig;
-use control::{Flow, EventHandler, State};
+use control::{EventHandler, Flow, State};
 use conrod_helper::ConrodUI;
 use menu::*;
 
@@ -48,15 +52,19 @@ fn main() {
     std::env::set_var("WINIT_UNIX_BACKEND", "x11");
 
     // Try to read config file, fallback to the default config otherwise
-    let config: GameConfig = File::open("resources/config.json").ok().and_then(|mut f| {
-        let mut s = String::new();
-        f.read_to_string(&mut s).ok().and_then(|_| serde_json::from_str(&s).ok())
-    }).unwrap_or_default();
+    let config: GameConfig = File::open("resources/config.json")
+        .ok()
+        .and_then(|mut f| {
+            let mut s = String::new();
+            f.read_to_string(&mut s)
+                .ok()
+                .and_then(|_| serde_json::from_str(&s).ok())
+        })
+        .unwrap_or_default();
 
     let size = config.screen_size.clone();
 
-    let mut window: PistonWindow = WindowSettings::new(
-        config.title.clone(), [size.w, size.h])
+    let mut window: PistonWindow = WindowSettings::new(config.title.clone(), [size.w, size.h])
         .exit_on_esc(true)
         .build()
         .expect("Cannot create window.");
@@ -69,7 +77,8 @@ fn main() {
     ui.fonts.insert_from_file("resources/Ubuntu-R.ttf").unwrap();
 
     let mut start_menu: ConrodUI<StartMenu> = ConrodUI::new(size.clone(), &mut window, &mut ui);
-    let mut play_again_menu: ConrodUI<PlayAgainMenu> = ConrodUI::new(size.clone(), &mut window, &mut ui);
+    let mut play_again_menu: ConrodUI<PlayAgainMenu> =
+        ConrodUI::new(size.clone(), &mut window, &mut ui);
     let mut state = State::StartMenu;
 
     let mut game = game::Game::new(config.clone(), &window);
@@ -89,7 +98,7 @@ fn main() {
                 PlayAgain => {
                     state = State::Playing;
                     game = game::Game::new(config.clone(), &window);
-                },
+                }
             }
         }
     }

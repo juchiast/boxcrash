@@ -33,35 +33,43 @@ impl Tunel {
             ((0., 0., 0.), (0., 0., self.size.z)),
             ((self.size.x, 0., 0.), (self.size.x, 0., self.size.z)),
             ((0., self.size.y, 0.), (0., self.size.y, self.size.z)),
-            ((self.size.x, self.size.y, 0.), (self.size.x, self.size.y, self.size.z)),
-        ].into_iter().map(|(a, b)| camera.render_line(&a.into(), &b.into()))
-         .filter_map(|x| x.map(|x| (x, self.color)))
-         .chain(self.divider_render(camera))
-         .chain(self.decor_render(camera))
-         .collect()
+            (
+                (self.size.x, self.size.y, 0.),
+                (self.size.x, self.size.y, self.size.z),
+            ),
+        ].into_iter()
+            .map(|(a, b)| camera.render_line(&a.into(), &b.into()))
+            .filter_map(|x| x.map(|x| (x, self.color)))
+            .chain(self.divider_render(camera))
+            .chain(self.decor_render(camera))
+            .collect()
     }
 
     pub fn update(&mut self, dt: f64, speed: f64) {
-        self.divider_state -= dt*speed;
+        self.divider_state -= dt * speed;
         if self.divider_state < 0. {
-            self.divider_state += 2.*self.divider.y;
+            self.divider_state += 2. * self.divider.y;
         }
-        self.decor_state -= dt*speed;
+        self.decor_state -= dt * speed;
         if self.decor_state < 0. {
             self.decor_state += self.decor_distance;
         }
     }
 
     fn divider_render(&self, camera: &Camera) -> ::Rendered {
-        let mut points = [vec3(self.size.x/2., 0., self.divider_state); 4];
-        points[2].z -= self.divider.y; points[3].z -= self.divider.y;
-        points[0].x -= self.divider.x/2.; points[3].x -= self.divider.x/2.;
-        points[1].x += self.divider.x/2.; points[2].x += self.divider.x/2.;
+        let mut points = [vec3(self.size.x / 2., 0., self.divider_state); 4];
+        points[2].z -= self.divider.y;
+        points[3].z -= self.divider.y;
+        points[0].x -= self.divider.x / 2.;
+        points[3].x -= self.divider.x / 2.;
+        points[1].x += self.divider.x / 2.;
+        points[2].x += self.divider.x / 2.;
 
         let mut ret = Vec::new();
         {
             let mut r = |p: &[Vector3<f64>; 4]| {
-                let iter = p.iter().zip(p.iter().cycle().skip(1))
+                let iter = p.iter()
+                    .zip(p.iter().cycle().skip(1))
                     .map(|(x, y)| camera.render_line(x, y))
                     .filter_map(|x| x.map(|x| (x, self.color)));
                 ret.append(&mut iter.collect());
@@ -69,7 +77,7 @@ impl Tunel {
             while points[0].z <= self.size.z {
                 r(&points);
                 for p in &mut points {
-                    p.z += 2.*self.divider.y;
+                    p.z += 2. * self.divider.y;
                 }
             }
             r(&points);
@@ -96,5 +104,4 @@ impl Tunel {
         }
         ret
     }
-
 }
