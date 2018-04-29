@@ -28,7 +28,6 @@ fn rnd((a, b): (f64, f64)) -> f64 {
     rand::random::<f64>() * (b - a) + a
 }
 
-mod camera;
 mod color;
 mod conrod_helper;
 mod control;

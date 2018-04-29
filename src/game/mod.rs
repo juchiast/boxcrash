@@ -1,4 +1,5 @@
 mod bot;
+mod camera;
 mod car;
 mod game;
 mod tunel;

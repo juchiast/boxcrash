@@ -1,10 +1,9 @@
-use camera::Camera;
+use game::camera::Camera;
 use color::*;
 use control::{EventHandler, Flow};
 use game::bot::BoxRules;
 use game::car::*;
 use game::world::World;
-use Pixel;
 
 use std::cell::RefCell;
 use std::ops::DerefMut;
@@ -55,7 +54,7 @@ impl Default for GameConfig {
         use std::f64::consts::PI;
         GameConfig {
             title: "Box Crash".to_owned(),
-            screen_size: Pixel::new(800, 600),
+            screen_size: ::Pixel::new(800, 600),
             ups: 60,
             max_fps: 60,
             tunel_size: [15., 8., 150.],

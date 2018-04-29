@@ -12,13 +12,13 @@ widget_ids! {
     }
 }
 
-pub struct StartMenu();
+pub struct StartMenu;
 
 impl Gui for StartMenu {
     type Ids = self::Ids;
 
     fn new() -> Self {
-        StartMenu()
+        StartMenu
     }
 
     fn ids(&self, w: widget::id::Generator) -> Self::Ids {
@@ -44,13 +44,13 @@ impl Gui for StartMenu {
     }
 }
 
-pub struct PlayAgainMenu();
+pub struct PlayAgainMenu;
 
 impl Gui for PlayAgainMenu {
     type Ids = self::Ids;
 
     fn new() -> Self {
-        PlayAgainMenu()
+        PlayAgainMenu
     }
 
     fn ids(&self, w: widget::id::Generator) -> Self::Ids {

@@ -1,4 +1,4 @@
-use camera::Camera;
+use game::camera::Camera;
 use cgmath::{vec3, Vector2, Vector3};
 use color::*;
 
