@@ -1,5 +1,5 @@
-use cgmath::{Vector2, Vector3, vec3};
 use cgmath::prelude::*;
+use cgmath::{vec3, Vector2, Vector3};
 
 const MAX_CAM_WIDTH: f64 = 1.0;
 
@@ -18,13 +18,12 @@ pub struct Camera {
 
 impl Camera {
     pub fn new(size: ::Pixel, location: Vector3<f64>) -> Camera {
-        let c = vec3(0., 0., 0.5);
         Camera {
             eye: location,
-            c: c,
+            c: vec3(0., 0., 0.5),
             axis_x: vec3(1.0, 0.0, 0.0),
             axis_y: vec3(0.0, 1.0, 0.0),
-            zoom_factor: size.w as f64 / MAX_CAM_WIDTH,
+            zoom_factor: f64::from(size.w) / MAX_CAM_WIDTH,
             screen_size: size,
         }
     }
@@ -67,8 +66,9 @@ impl Camera {
         }
         let a = x.dot(self.axis_x) / self.axis_x.magnitude();
         let b = x.dot(self.axis_y) / self.axis_y.magnitude();
-        let w = a * self.zoom_factor + self.screen_size.w as f64 / 2.;
-        let h = self.screen_size.h as f64 - (b * self.zoom_factor + self.screen_size.h as f64 / 2.);
+        let w = a * self.zoom_factor + f64::from(self.screen_size.w) / 2.;
+        let h = f64::from(self.screen_size.h)
+            - (b * self.zoom_factor + f64::from(self.screen_size.h) / 2.);
         Vector2::new(w, h)
     }
 

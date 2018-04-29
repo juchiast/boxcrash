@@ -1,6 +1,6 @@
-use cgmath::{Vector2, Vector3, vec3};
-use color::*;
 use camera::Camera;
+use cgmath::{vec3, Vector2, Vector3};
+use color::*;
 
 pub struct Tunel {
     // Size of tunel, x, y, z is the width, height, and deep of the

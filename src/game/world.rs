@@ -1,11 +1,11 @@
-use game::tunel::Tunel;
-use game::car::*;
-use game::bot::{Bot, BoxRules};
-use color::*;
-use cgmath::{Vector3, vec3};
-use cgmath::prelude::*;
-use game::GameConfig;
 use camera::Camera;
+use cgmath::prelude::*;
+use cgmath::{vec3, Vector3};
+use color::*;
+use game::bot::{Bot, BoxRules};
+use game::car::*;
+use game::tunel::Tunel;
+use game::GameConfig;
 
 pub struct World {
     pub tunel: Tunel,
@@ -30,7 +30,7 @@ impl World {
 
         World {
             tunel: Tunel::new(&config),
-            player: player,
+            player,
             bots: Vec::new(),
             bullets: Vec::new(),
         }

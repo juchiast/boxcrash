@@ -1,18 +1,18 @@
-use game::world::World;
 use camera::Camera;
 use color::*;
-use game::car::*;
-use game::bot::BoxRules;
-use Pixel;
 use control::{EventHandler, Flow};
+use game::bot::BoxRules;
+use game::car::*;
+use game::world::World;
+use Pixel;
 
 use std::cell::RefCell;
 use std::ops::DerefMut;
 use std::time::Instant;
 
-use piston_window::*;
-use cgmath::{Vector2, vec3};
 use cgmath::prelude::*;
+use cgmath::{vec3, Vector2};
+use piston_window::*;
 
 // Configurable game's contansts.
 // A tuple presents a range of something.
@@ -164,11 +164,11 @@ impl Game {
         };
 
         Game {
-            config: config,
-            world: world,
-            bot_rules: bot_rules,
-            camera: camera,
-            state: state,
+            config,
+            world,
+            bot_rules,
+            camera,
+            state,
             glyphs: RefCell::new(glyphs),
             ellipse: RefCell::new(ellipse),
         }
@@ -176,7 +176,7 @@ impl Game {
 
     fn new_camera<T: Car>(config: &GameConfig, player: &T) -> Camera {
         Camera::new(
-            config.screen_size.clone(),
+            config.screen_size,
             vec3(0., config.camera_height, -config.camera_distance) + player.pos(),
         )
     }
@@ -184,7 +184,7 @@ impl Game {
     fn update_fps(&mut self) {
         let d = self.state.last_frame.elapsed();
         self.state.last_frame = Instant::now();
-        self.state.fps = 1. / (d.as_secs() as f64 + 1e-9 * d.subsec_nanos() as f64);
+        self.state.fps = 1. / (d.as_secs() as f64 + 1e-9 * f64::from(d.subsec_nanos()));
     }
 
     fn mouse_move(&mut self, x: f64, y: f64) {
@@ -252,11 +252,13 @@ impl Game {
     fn draw(&mut self, e: &Event, window: &mut PistonWindow) {
         // Return a horizontal bar
         macro_rules! bar {
-            ($curr: expr, $full: expr) => {
-                [0.,
-                15.0,
-                self.config.screen_size.w as f64/2.*$curr/$full,
-                20.0,]
+            ($curr:expr, $full:expr) => {
+                [
+                    0.,
+                    15.0,
+                    f64::from(self.config.screen_size.w) / 2. * $curr / $full,
+                    20.0,
+                ]
             };
         }
         let jump_bar = bar!(self.state.jump_timeout, self.config.jump_timeout);
@@ -287,8 +289,8 @@ impl Game {
 
         if self.state.rotate_cam {
             let w = 20.;
-            let x = self.config.screen_size.w as f64 / 2. - w / 2.;
-            let y = self.config.screen_size.h as f64 / 2. - w / 2.;
+            let x = f64::from(self.config.screen_size.w) / 2. - w / 2.;
+            let y = f64::from(self.config.screen_size.h) / 2. - w / 2.;
             let ellipse = self.ellipse.borrow();
             window.draw_2d(e, |c, g| {
                 ellipse.draw([x, y, w, w], &c.draw_state, c.transform, g);
@@ -363,10 +365,10 @@ impl EventHandler for Game {
         window: &mut PistonWindow,
         _: &mut Self::Input,
     ) -> Option<Flow> {
+        use Event::*;
         use Input::*;
         use Loop::*;
         use Motion::*;
-        use Event::*;
         match e {
             Loop(Render(_)) => {
                 self.update_fps();

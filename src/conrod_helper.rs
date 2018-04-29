@@ -1,13 +1,13 @@
-use piston_window::{Event, G2d, G2dTexture, PistonWindow, TextureSettings, UpdateEvent, Window};
-use piston_window::texture::UpdateTexture;
-use piston_window;
-use conrod::UiCell;
-use conrod::widget;
-use conrod::text::GlyphCache;
 use conrod;
+use conrod::text::GlyphCache;
+use conrod::widget;
+use conrod::UiCell;
+use piston_window;
+use piston_window::texture::UpdateTexture;
+use piston_window::{Event, G2d, G2dTexture, PistonWindow, TextureSettings, UpdateEvent, Window};
 
-use Pixel;
 use control::{EventHandler, Flow};
+use Pixel;
 
 pub trait Gui {
     type Ids;
@@ -45,10 +45,10 @@ impl<'a, G: Gui> ConrodUI<'a, G> {
         let ids = gui.ids(ui.widget_id_generator());
 
         ConrodUI {
-            gui: gui,
-            ids: ids,
-            glyph_cache: glyph_cache,
-            text_texture_cache: text_texture_cache,
+            gui,
+            ids,
+            glyph_cache,
+            text_texture_cache,
         }
     }
 }
@@ -62,7 +62,7 @@ impl<'a, G: Gui> EventHandler for ConrodUI<'a, G> {
         ui: &mut Self::Input,
     ) -> Option<Flow> {
         let size = window.size();
-        let (win_w, win_h) = (size.width as f64, size.height as f64);
+        let (win_w, win_h) = (f64::from(size.width), f64::from(size.height));
         if let Some(e) = conrod::backend::piston::event::convert(event.clone(), win_w, win_h) {
             ui.handle_event(e);
         }

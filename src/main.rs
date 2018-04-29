@@ -10,14 +10,14 @@ extern crate serde_json;
 type Rendered = Vec<([cgmath::Vector2<f64>; 2], color::Color)>;
 
 // Pixel present a point in the window and window's size
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Copy, Serialize, Deserialize)]
 pub struct Pixel {
     pub w: u32,
     pub h: u32,
 }
 impl Pixel {
     pub fn new(w: u32, h: u32) -> Pixel {
-        Pixel { w: w, h: h }
+        Pixel { w, h }
     }
 }
 
@@ -28,20 +28,20 @@ fn rnd((a, b): (f64, f64)) -> f64 {
     rand::random::<f64>() * (b - a) + a
 }
 
-mod color;
 mod camera;
-mod game;
-mod control;
+mod color;
 mod conrod_helper;
+mod control;
+mod game;
 mod menu;
 
-use piston_window::*;
-use std::io::prelude::*;
-use std::fs::File;
-use game::GameConfig;
-use control::{EventHandler, Flow, State};
 use conrod_helper::ConrodUI;
+use control::{EventHandler, Flow, State};
+use game::GameConfig;
 use menu::*;
+use piston_window::*;
+use std::fs::File;
+use std::io::prelude::*;
 
 fn main() {
     // Wayland backend contains some bugs, prefer x11
@@ -58,7 +58,7 @@ fn main() {
         })
         .unwrap_or_default();
 
-    let size = config.screen_size.clone();
+    let size = config.screen_size;
 
     let mut window: PistonWindow = WindowSettings::new(config.title.clone(), [size.w, size.h])
         .exit_on_esc(true)
@@ -67,14 +67,13 @@ fn main() {
     window.set_ups(config.ups);
     window.set_max_fps(config.max_fps);
 
-    let mut ui = conrod::UiBuilder::new([size.w as f64, size.h as f64])
+    let mut ui = conrod::UiBuilder::new([f64::from(size.w), f64::from(size.h)])
         .theme(conrod_helper::theme())
         .build();
     ui.fonts.insert_from_file("resources/Ubuntu-R.ttf").unwrap();
 
-    let mut start_menu: ConrodUI<StartMenu> = ConrodUI::new(size.clone(), &mut window, &mut ui);
-    let mut play_again_menu: ConrodUI<PlayAgainMenu> =
-        ConrodUI::new(size.clone(), &mut window, &mut ui);
+    let mut start_menu: ConrodUI<StartMenu> = ConrodUI::new(size, &mut window, &mut ui);
+    let mut play_again_menu: ConrodUI<PlayAgainMenu> = ConrodUI::new(size, &mut window, &mut ui);
     let mut state = State::StartMenu;
 
     let mut game = game::Game::new(config.clone(), &window);

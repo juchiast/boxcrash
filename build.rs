@@ -23,8 +23,8 @@ THE SOFTWARE.
 */
 use std::env;
 use std::fs::{copy, create_dir_all, read_dir};
-use std::path::{Path, PathBuf};
 use std::io;
+use std::path::{Path, PathBuf};
 
 fn main() {
     let res_dir_source = Path::new(&env::var("CARGO_MANIFEST_DIR").unwrap()).join("resources/");
