@@ -17,15 +17,15 @@ pub trait Gui {
     fn ids(&self, widget::id::Generator) -> Self::Ids;
 }
 
-pub struct ConrodUI<G: Gui> {
+pub struct ConrodUI<'a, G: Gui> {
     gui: G,
     ids: G::Ids,
-    glyph_cache: GlyphCache,
+    glyph_cache: GlyphCache<'a>,
     text_texture_cache: G2dTexture,
 }
 
-impl<G: Gui> ConrodUI<G> {
-    pub fn new(size: Pixel, window: &mut PistonWindow, ui: &mut conrod::Ui) -> ConrodUI<G> {
+impl<'a, G: Gui> ConrodUI<'a, G> {
+    pub fn new(size: Pixel, window: &mut PistonWindow, ui: &mut conrod::Ui) -> ConrodUI<'a, G> {
         let gui = G::new();
 
         // Create a texture to use for efficiently caching text on the GPU.
@@ -53,7 +53,7 @@ impl<G: Gui> ConrodUI<G> {
     }
 }
 
-impl<G: Gui> EventHandler for ConrodUI<G> {
+impl<'a, G: Gui> EventHandler for ConrodUI<'a, G> {
     type Input = conrod::Ui;
     fn handle_event(
         &mut self,

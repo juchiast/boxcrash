@@ -282,7 +282,7 @@ impl Game {
                 glyphs.deref_mut(),
                 c.transform.trans(0., 10.),
                 g,
-            );
+            ).unwrap();
         });
 
         if self.state.rotate_cam {
