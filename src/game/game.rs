@@ -1,8 +1,8 @@
-use world::World;
+use game::world::World;
 use camera::Camera;
 use color::*;
-use car::*;
-use bot::BoxRules;
+use game::car::*;
+use game::bot::BoxRules;
 use Pixel;
 use control::{EventHandler, Flow};
 

@@ -1,4 +1,4 @@
-use car::*;
+use game::car::*;
 use cgmath::{Vector2, Vector3, vec3};
 use color::*;
 use camera::Camera;

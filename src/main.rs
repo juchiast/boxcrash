@@ -29,11 +29,7 @@ fn rnd((a, b): (f64, f64)) -> f64 {
 }
 
 mod color;
-mod world;
-mod tunel;
-mod car;
 mod camera;
-mod bot;
 mod game;
 mod control;
 mod conrod_helper;
