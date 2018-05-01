@@ -11,7 +11,7 @@ This game was written with hope to be a good example of game development in Rust
 
 Download binary (64-bit Windows and Linux) here: https://github.com/juchiast/boxcrash/releases
 
-This code should be compiled with the latest stable version of Rust (1.18.0 as of this writing).
+This code should be compiled with the latest stable version of Rust.
 
 Almost all game's constants are configurable via `resources/config.json`.
 You should edit the screen size details to match your monitor.
