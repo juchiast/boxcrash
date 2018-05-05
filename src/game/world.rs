@@ -1,11 +1,11 @@
 use cgmath::prelude::*;
 use cgmath::{Vector3, vec3};
 use color::*;
-use game::GameConfig;
-use game::bot::{Bot, BoxRules};
-use game::camera::Camera;
-use game::car::*;
-use game::tunel::Tunel;
+use super::GameConfig;
+use super::bot::{Bot, BoxRules};
+use super::camera::Camera;
+use super::car::*;
+use super::tunel::Tunel;
 
 pub struct World {
     pub tunel: Tunel,

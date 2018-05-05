@@ -1,6 +1,6 @@
 use cgmath::{Vector2, Vector3, vec3};
 use color::*;
-use game::camera::Camera;
+use super::camera::Camera;
 
 pub struct Tunel {
     // Size of tunel, x, y, z is the width, height, and deep of the

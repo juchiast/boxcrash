@@ -1,7 +1,7 @@
 use cgmath::{Vector2, Vector3, vec3};
 use color::*;
-use game::camera::Camera;
-use game::car::*;
+use super::camera::Camera;
+use super::car::*;
 use rnd;
 
 // Action with duration

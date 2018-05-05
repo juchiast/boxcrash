@@ -1,6 +1,6 @@
 use cgmath::{Vector2, Vector3};
 use color::*;
-use game::camera::Camera;
+use super::camera::Camera;
 
 // Present a car that can be drawed, check for collision
 // with other car and bullet, turn left/right, move forward

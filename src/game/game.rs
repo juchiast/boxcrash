@@ -1,9 +1,9 @@
 use color::*;
 use control::{EventHandler, Flow};
-use game::bot::BoxRules;
-use game::camera::Camera;
-use game::car::*;
-use game::world::World;
+use super::bot::BoxRules;
+use super::camera::Camera;
+use super::car::*;
+use super::world::World;
 
 use std::cell::RefCell;
 use std::ops::DerefMut;
