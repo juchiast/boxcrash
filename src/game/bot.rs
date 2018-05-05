@@ -1,6 +1,6 @@
-use game::camera::Camera;
-use cgmath::{vec3, Vector2, Vector3};
+use cgmath::{Vector2, Vector3, vec3};
 use color::*;
+use game::camera::Camera;
 use game::car::*;
 use rnd;
 

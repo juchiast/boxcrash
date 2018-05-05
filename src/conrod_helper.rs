@@ -1,7 +1,7 @@
 use conrod;
+use conrod::UiCell;
 use conrod::text::GlyphCache;
 use conrod::widget;
-use conrod::UiCell;
 use piston_window;
 use piston_window::texture::UpdateTexture;
 use piston_window::{Event, G2d, G2dTexture, PistonWindow, TextureSettings, UpdateEvent, Window};

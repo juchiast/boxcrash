@@ -1,5 +1,5 @@
-use conrod::widget;
 use conrod::UiCell;
+use conrod::widget;
 
 use conrod_helper::Gui;
 use control::Flow;

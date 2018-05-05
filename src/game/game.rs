@@ -1,7 +1,7 @@
-use game::camera::Camera;
 use color::*;
 use control::{EventHandler, Flow};
 use game::bot::BoxRules;
+use game::camera::Camera;
 use game::car::*;
 use game::world::World;
 
@@ -10,7 +10,7 @@ use std::ops::DerefMut;
 use std::time::Instant;
 
 use cgmath::prelude::*;
-use cgmath::{vec3, Vector2};
+use cgmath::{Vector2, vec3};
 use piston_window::*;
 
 // Configurable game's contansts.
