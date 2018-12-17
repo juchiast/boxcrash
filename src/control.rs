@@ -14,5 +14,6 @@ pub enum State {
 
 pub trait EventHandler {
     type Input;
-    fn handle_event(&mut self, _: Event, _: &mut PistonWindow, _: &mut Self::Input) -> Option<Flow>;
+    fn handle_event(&mut self, _: Event, _: &mut PistonWindow, _: &mut Self::Input)
+        -> Option<Flow>;
 }

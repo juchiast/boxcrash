@@ -1,5 +1,5 @@
 use cgmath::prelude::*;
-use cgmath::{Vector2, Vector3, vec3};
+use cgmath::{vec3, Vector2, Vector3};
 
 const MAX_CAM_WIDTH: f64 = 1.0;
 

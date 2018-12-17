@@ -1,16 +1,16 @@
-use crate::color::*;
-use crate::control::{EventHandler, Flow};
 use super::bot::BoxRules;
 use super::camera::Camera;
 use super::car::*;
 use super::world::World;
+use crate::color::*;
+use crate::control::{EventHandler, Flow};
 
 use std::cell::RefCell;
 use std::ops::DerefMut;
 use std::time::Instant;
 
 use cgmath::prelude::*;
-use cgmath::{Vector2, vec3};
+use cgmath::{vec3, Vector2};
 use piston_window::*;
 
 // Configurable game's contansts.
@@ -125,7 +125,8 @@ impl Game {
             "resources/Ubuntu-R.ttf",
             window.factory.clone(),
             texture::TextureSettings::new(),
-        ).expect("Unable to load font.");
+        )
+        .expect("Unable to load font.");
         let bot_rules = BoxRules {
             size: config.bot_size,
             position: [
@@ -200,10 +201,12 @@ impl Game {
             Button::Keyboard(Key::A) => self.state.turn = Turn::Left,
             Button::Keyboard(Key::D) => self.state.turn = Turn::Right,
             Button::Keyboard(Key::W) => self.state.sprint = true,
-            Button::Keyboard(Key::Space) => if self.state.jump_timeout <= 0. {
-                self.state.jump_timeout = self.config.jump_timeout;
-                self.world.player.jump();
-            },
+            Button::Keyboard(Key::Space) => {
+                if self.state.jump_timeout <= 0. {
+                    self.state.jump_timeout = self.config.jump_timeout;
+                    self.world.player.jump();
+                }
+            }
             Button::Mouse(MouseButton::Right) => {
                 if self.config.zoom_in {
                     self.camera.zoom_in();
@@ -234,12 +237,16 @@ impl Game {
     }
     fn release(&mut self, key: Button) {
         match key {
-            Button::Keyboard(Key::A) => if let Turn::Left = self.state.turn {
-                self.state.turn = Turn::None;
-            },
-            Button::Keyboard(Key::D) => if let Turn::Right = self.state.turn {
-                self.state.turn = Turn::None;
-            },
+            Button::Keyboard(Key::A) => {
+                if let Turn::Left = self.state.turn {
+                    self.state.turn = Turn::None;
+                }
+            }
+            Button::Keyboard(Key::D) => {
+                if let Turn::Right = self.state.turn {
+                    self.state.turn = Turn::None;
+                }
+            }
             Button::Keyboard(Key::W) => self.state.sprint = false,
             Button::Mouse(MouseButton::Right) => {
                 self.state.rotate_cam = false;
@@ -283,7 +290,8 @@ impl Game {
                 glyphs.deref_mut(),
                 c.transform.trans(0., 10.),
                 g,
-            ).unwrap();
+            )
+            .unwrap();
         });
 
         if self.state.rotate_cam {
@@ -346,7 +354,8 @@ impl Game {
         // Update camera's location
         self.camera.eye += self.world.player.position - old;
         // Check for player's collision with bot
-        if self.world
+        if self
+            .world
             .bots
             .iter()
             .any(|x| self.world.player.crashed(&x.car))

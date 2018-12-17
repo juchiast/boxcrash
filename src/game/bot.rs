@@ -1,8 +1,8 @@
-use cgmath::{Vector2, Vector3, vec3};
-use crate::color::*;
 use super::camera::Camera;
 use super::car::*;
+use crate::color::*;
 use crate::rnd;
+use cgmath::{vec3, Vector2, Vector3};
 
 // Action with duration
 // e.g. `TurnLeft(3.)` means turn left for 3s
@@ -74,17 +74,23 @@ impl Bot {
         if let Some(a) = self.actions.pop() {
             match a {
                 Action::Jump => self.car.jump(),
-                Action::TurnRight(t) => if t > 0. {
-                    self.car.turn_right(dt);
-                    self.actions.push(Action::TurnRight(t - dt));
-                },
-                Action::TurnLeft(t) => if t > 0. {
-                    self.car.turn_left(dt);
-                    self.actions.push(Action::TurnLeft(t - dt));
-                },
-                Action::Rest(t) => if t > 0. {
-                    self.actions.push(Action::Rest(t - dt));
-                },
+                Action::TurnRight(t) => {
+                    if t > 0. {
+                        self.car.turn_right(dt);
+                        self.actions.push(Action::TurnRight(t - dt));
+                    }
+                }
+                Action::TurnLeft(t) => {
+                    if t > 0. {
+                        self.car.turn_left(dt);
+                        self.actions.push(Action::TurnLeft(t - dt));
+                    }
+                }
+                Action::Rest(t) => {
+                    if t > 0. {
+                        self.actions.push(Action::Rest(t - dt));
+                    }
+                }
             }
         }
     }

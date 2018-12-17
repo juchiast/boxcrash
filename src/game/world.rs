@@ -1,11 +1,11 @@
-use cgmath::prelude::*;
-use cgmath::{Vector3, vec3};
-use crate::color::*;
-use super::GameConfig;
 use super::bot::{Bot, BoxRules};
 use super::camera::Camera;
 use super::car::*;
 use super::tunel::Tunel;
+use super::GameConfig;
+use crate::color::*;
+use cgmath::prelude::*;
+use cgmath::{vec3, Vector3};
 
 pub struct World {
     pub tunel: Tunel,
@@ -88,14 +88,16 @@ impl World {
                 .partial_cmp(&b.pos().z)
                 .expect("Float compare failed")
         });
-        let set = self.bots
+        let set = self
+            .bots
             .iter()
             .zip(self.bots.iter().skip(1))
             .enumerate()
             .filter(|&(_, (x, y))| x.crashed(y))
             .map(|(i, _)| i)
             .collect::<::std::collections::BTreeSet<_>>();
-        self.bots = self.bots
+        self.bots = self
+            .bots
             .iter()
             .enumerate()
             .filter(|&(i, _)| !((i > 0 && set.contains(&(i - 1))) || set.contains(&i)))

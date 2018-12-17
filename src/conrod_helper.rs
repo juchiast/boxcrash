@@ -1,7 +1,7 @@
 use conrod;
-use conrod::UiCell;
 use conrod::text::GlyphCache;
 use conrod::widget;
+use conrod::UiCell;
 use piston_window;
 use piston_window::texture::UpdateTexture;
 use piston_window::{Event, G2d, G2dTexture, PistonWindow, TextureSettings, UpdateEvent, Window};
@@ -24,7 +24,11 @@ pub struct ConrodUI<'a, G: Gui> {
 }
 
 impl<'a, G: Gui> ConrodUI<'a, G> {
-    pub fn new(size: crate::Pixel, window: &mut PistonWindow, ui: &mut conrod::Ui) -> ConrodUI<'a, G> {
+    pub fn new(
+        size: crate::Pixel,
+        window: &mut PistonWindow,
+        ui: &mut conrod::Ui,
+    ) -> ConrodUI<'a, G> {
         let gui = G::new();
 
         // Create a texture to use for efficiently caching text on the GPU.
@@ -91,7 +95,8 @@ impl<'a, G: Gui> EventHandler for ConrodUI<'a, G> {
                         &text_vertex_data[..],
                         offset,
                         size,
-                    ).expect("failed to update texture");
+                    )
+                    .expect("failed to update texture");
                 };
 
                 fn texture_from_image<T>(img: &T) -> &T {

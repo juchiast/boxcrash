@@ -1,6 +1,6 @@
-use cgmath::{Vector2, Vector3, vec3};
-use crate::color::*;
 use super::camera::Camera;
+use crate::color::*;
+use cgmath::{vec3, Vector2, Vector3};
 
 pub struct Tunel {
     // Size of tunel, x, y, z is the width, height, and deep of the
@@ -37,12 +37,13 @@ impl Tunel {
                 (self.size.x, self.size.y, 0.),
                 (self.size.x, self.size.y, self.size.z),
             ),
-        ].into_iter()
-            .map(|(a, b)| camera.render_line(&a.into(), &b.into()))
-            .filter_map(|x| x.map(|x| (x, self.color)))
-            .chain(self.divider_render(camera))
-            .chain(self.decor_render(camera))
-            .collect()
+        ]
+        .into_iter()
+        .map(|(a, b)| camera.render_line(&a.into(), &b.into()))
+        .filter_map(|x| x.map(|x| (x, self.color)))
+        .chain(self.divider_render(camera))
+        .chain(self.decor_render(camera))
+        .collect()
     }
 
     pub fn update(&mut self, dt: f64, speed: f64) {
@@ -68,7 +69,8 @@ impl Tunel {
         let mut ret = Vec::new();
         {
             let mut r = |p: &[Vector3<f64>; 4]| {
-                let iter = p.iter()
+                let iter = p
+                    .iter()
                     .zip(p.iter().cycle().skip(1))
                     .map(|(x, y)| camera.render_line(x, y))
                     .filter_map(|x| x.map(|x| (x, self.color)));
