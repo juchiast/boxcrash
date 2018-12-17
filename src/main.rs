@@ -34,10 +34,10 @@ mod control;
 mod game;
 mod menu;
 
-use conrod_helper::ConrodUI;
-use control::{EventHandler, Flow, State};
-use game::GameConfig;
-use menu::*;
+use crate::conrod_helper::ConrodUI;
+use crate::control::{EventHandler, Flow, State};
+use crate::game::GameConfig;
+use crate::menu::*;
 use piston_window::*;
 use std::fs::File;
 use std::io::prelude::*;
@@ -85,7 +85,7 @@ fn main() {
         };
 
         if let Some(flow) = flow {
-            use Flow::*;
+            use crate::Flow::*;
             match flow {
                 StartGame => state = State::Playing,
                 LoseGame => state = State::PlayAgainMenu,

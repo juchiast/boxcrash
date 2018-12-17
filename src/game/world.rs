@@ -1,6 +1,6 @@
 use cgmath::prelude::*;
 use cgmath::{Vector3, vec3};
-use color::*;
+use crate::color::*;
 use super::GameConfig;
 use super::bot::{Bot, BoxRules};
 use super::camera::Camera;
@@ -36,7 +36,7 @@ impl World {
         }
     }
 
-    pub fn render(&self, camera: &Camera) -> ::Rendered {
+    pub fn render(&self, camera: &Camera) -> crate::Rendered {
         Vec::new()
             .into_iter()
             .chain(self.tunel.render(camera))
@@ -110,7 +110,7 @@ impl World {
             .push([origin, direction * len / direction.magnitude(), direction]);
     }
 
-    fn bullets_render(&self, camera: &Camera) -> ::Rendered {
+    fn bullets_render(&self, camera: &Camera) -> crate::Rendered {
         self.bullets
             .iter()
             .filter_map(|x| {

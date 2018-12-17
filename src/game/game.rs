@@ -1,5 +1,5 @@
-use color::*;
-use control::{EventHandler, Flow};
+use crate::color::*;
+use crate::control::{EventHandler, Flow};
 use super::bot::BoxRules;
 use super::camera::Camera;
 use super::car::*;
@@ -18,7 +18,7 @@ use piston_window::*;
 #[derive(Serialize, Deserialize, Clone)]
 pub struct GameConfig {
     pub title: String,
-    pub screen_size: ::Pixel,
+    pub screen_size: crate::Pixel,
     pub ups: u64, // Update per second
     pub max_fps: u64,
     pub tunel_size: [f64; 3],
@@ -54,7 +54,7 @@ impl Default for GameConfig {
         use std::f64::consts::PI;
         GameConfig {
             title: "Box Crash".to_owned(),
-            screen_size: ::Pixel::new(800, 600),
+            screen_size: crate::Pixel::new(800, 600),
             ups: 60,
             max_fps: 60,
             tunel_size: [15., 8., 150.],
@@ -331,7 +331,7 @@ impl Game {
         self.state.spawn -= dt;
         if self.state.spawn < 0. {
             self.world.add_bot(&self.bot_rules);
-            self.state.spawn += ::rnd(self.config.spawn_time);
+            self.state.spawn += crate::rnd(self.config.spawn_time);
         }
         match self.state.turn {
             Turn::Left => self.world.player.turn_left(dt),
@@ -364,10 +364,10 @@ impl EventHandler for Game {
         window: &mut PistonWindow,
         _: &mut Self::Input,
     ) -> Option<Flow> {
-        use Event::*;
-        use Input::*;
-        use Loop::*;
-        use Motion::*;
+        use crate::Event::*;
+        use crate::Input::*;
+        use crate::Loop::*;
+        use crate::Motion::*;
         match e {
             Loop(Render(_)) => {
                 self.update_fps();
@@ -375,7 +375,7 @@ impl EventHandler for Game {
             }
             Loop(Update(args)) => self.update(args.dt),
             Input(Button(args)) => {
-                use ButtonState::*;
+                use crate::ButtonState::*;
                 match args.state {
                     Press => self.press(args.button),
                     Release => self.release(args.button),

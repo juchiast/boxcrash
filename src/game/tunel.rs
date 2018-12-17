@@ -1,5 +1,5 @@
 use cgmath::{Vector2, Vector3, vec3};
-use color::*;
+use crate::color::*;
 use super::camera::Camera;
 
 pub struct Tunel {
@@ -17,7 +17,7 @@ pub struct Tunel {
 }
 
 impl Tunel {
-    pub fn new(config: &::game::GameConfig) -> Tunel {
+    pub fn new(config: &crate::game::GameConfig) -> Tunel {
         Tunel {
             size: config.tunel_size.into(),
             color: BLUE,
@@ -56,7 +56,7 @@ impl Tunel {
         }
     }
 
-    fn divider_render(&self, camera: &Camera) -> ::Rendered {
+    fn divider_render(&self, camera: &Camera) -> crate::Rendered {
         let mut points = [vec3(self.size.x / 2., 0., self.divider_state); 4];
         points[2].z -= self.divider.y;
         points[3].z -= self.divider.y;
@@ -84,7 +84,7 @@ impl Tunel {
         }
         ret
     }
-    fn decor_render(&self, camera: &Camera) -> ::Rendered {
+    fn decor_render(&self, camera: &Camera) -> crate::Rendered {
         let mut data = [
             vec3(0., 0., self.decor_state),
             vec3(0., self.size.y, self.decor_state),

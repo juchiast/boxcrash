@@ -1,8 +1,8 @@
 use conrod::UiCell;
 use conrod::widget;
 
-use conrod_helper::Gui;
-use control::Flow;
+use crate::conrod_helper::Gui;
+use crate::control::Flow;
 
 widget_ids! {
     pub struct Ids {

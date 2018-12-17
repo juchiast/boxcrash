@@ -1,8 +1,8 @@
 use cgmath::{Vector2, Vector3, vec3};
-use color::*;
+use crate::color::*;
 use super::camera::Camera;
 use super::car::*;
-use rnd;
+use crate::rnd;
 
 // Action with duration
 // e.g. `TurnLeft(3.)` means turn left for 3s

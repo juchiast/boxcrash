@@ -13,11 +13,11 @@ pub struct Camera {
     axis_x: Vector3<f64>,
     axis_y: Vector3<f64>,
     zoom_factor: f64,
-    screen_size: ::Pixel,
+    screen_size: crate::Pixel,
 }
 
 impl Camera {
-    pub fn new(size: ::Pixel, location: Vector3<f64>) -> Camera {
+    pub fn new(size: crate::Pixel, location: Vector3<f64>) -> Camera {
         Camera {
             eye: location,
             c: vec3(0., 0., 0.5),

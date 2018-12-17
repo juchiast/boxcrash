@@ -6,14 +6,14 @@ use piston_window;
 use piston_window::texture::UpdateTexture;
 use piston_window::{Event, G2d, G2dTexture, PistonWindow, TextureSettings, UpdateEvent, Window};
 
-use control::{EventHandler, Flow};
+use crate::control::{EventHandler, Flow};
 
 pub trait Gui {
     type Ids;
 
     fn new() -> Self;
-    fn gui(&mut self, &mut UiCell, &Self::Ids) -> Option<Flow>;
-    fn ids(&self, widget::id::Generator) -> Self::Ids;
+    fn gui(&mut self, _: &mut UiCell, _: &Self::Ids) -> Option<Flow>;
+    fn ids(&self, _: widget::id::Generator) -> Self::Ids;
 }
 
 pub struct ConrodUI<'a, G: Gui> {
@@ -24,7 +24,7 @@ pub struct ConrodUI<'a, G: Gui> {
 }
 
 impl<'a, G: Gui> ConrodUI<'a, G> {
-    pub fn new(size: ::Pixel, window: &mut PistonWindow, ui: &mut conrod::Ui) -> ConrodUI<'a, G> {
+    pub fn new(size: crate::Pixel, window: &mut PistonWindow, ui: &mut conrod::Ui) -> ConrodUI<'a, G> {
         let gui = G::new();
 
         // Create a texture to use for efficiently caching text on the GPU.

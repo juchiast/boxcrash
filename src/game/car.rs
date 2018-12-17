@@ -1,14 +1,14 @@
 use cgmath::{Vector2, Vector3};
-use color::*;
+use crate::color::*;
 use super::camera::Camera;
 
 // Present a car that can be drawed, check for collision
 // with other car and bullet, turn left/right, move forward
 // and jump.
 pub trait Car {
-    fn render(&self, &Camera) -> Vec<([Vector2<f64>; 2], Color)>;
-    fn crashed(&self, &Self) -> bool;
-    fn hit(&self, &[Vector3<f64>; 3]) -> bool;
+    fn render(&self, _: &Camera) -> Vec<([Vector2<f64>; 2], Color)>;
+    fn crashed(&self, _: &Self) -> bool;
+    fn hit(&self, _: &[Vector3<f64>; 3]) -> bool;
     fn forward(&mut self, dt: f64, outside_speed: f64);
     fn turn_left(&mut self, dt: f64);
     fn turn_right(&mut self, dt: f64);
